@@ -1,0 +1,11 @@
+.Home {
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .Container {
+    width: 60vw;
+    height: 300px;
+    border: 1px solid black;
+  }
+}
