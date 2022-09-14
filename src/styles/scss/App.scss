@@ -1,11 +1,52 @@
+@import "./_variables.scss";
+
 .Home {
-  background-color: red;
+  height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  .Container {
-    width: 60vw;
-    height: 300px;
+  .Container__row {
+    width: 70vw;
+    border: 1px solid black;
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    margin-bottom: 2rem;
+    .row {
+      &:not(:last-child) {
+        border-bottom: 1px solid black;
+      }
+      min-height: 12vh;
+      display: flex;
+      .row__rank {
+        width: 10%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 1.5rem;
+        &.pink {
+          background-color: $pink;
+        }
+        &.orange {
+          background-color: $orange;
+        }
+        &.lemon {
+          background-color: $lemon;
+        }
+        &.purple {
+          background-color: $purple;
+        }
+        &.grey {
+          background-color: $grey;
+        }
+      }
+    }
+  }
+  .Container__image {
+    width: 70vw;
+    min-height: 12vh;
     border: 1px solid black;
   }
 }
