@@ -1,140 +1,114 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import {
   DragDropContext,
   Draggable,
+  DraggingStyle,
   Droppable,
   DropResult,
+  NotDraggingStyle,
 } from "react-beautiful-dnd";
+import produce from "immer";
+import { useRecoilState } from "recoil";
+import { dataAtom } from "./Atom";
+import RowDrag, { DroppableItem, DraggableItem } from "./Components/RowDrag";
 
-const ItemBox = styled.div`
-  width: 100px;
-  height: 100px;
-  background-color: ${(props: { bgColor: string }) =>
-    props.bgColor ? props.bgColor : "red"};
-  border: 1px solid black;
+const Home = styled.div`
+  width: 80vw;
+  margin: 5% auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
-  cursor: pointer;
-`;
-const Container_Item = styled.div`
-  width: 70vw;
-  min-height: 12vh;
-  border: 1px solid black;
-  display: flex;
 `;
 const Container_Row = styled.div`
-  width: 70vw;
+  width: 100%;
   border: 1px solid black;
   display: grid;
   grid-template-rows: repeat(5, 1fr);
   margin-bottom: 2rem;
-  .row {
-    &:not(:last-child) {
-      border-bottom: 1px solid black;
-    }
-    min-height: 12vh;
-    display: flex;
-    .row__rank {
-      width: 100px;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 1.5rem;
-      &.pink {
-        background-color: $pink;
-      }
-      &.orange {
-        background-color: $orange;
-      }
-      &.lemon {
-        background-color: $lemon;
-      }
-      &.purple {
-        background-color: $purple;
-      }
-      &.grey {
-        background-color: $grey;
-      }
-    }
-  }
 `;
-const Row = styled.div`
-  &:not(:last-child) {
-    border-bottom: 1px solid black;
-  }
-  min-height: 12vh;
-  display: flex;
-`;
-const RowRank = styled.div`
-  width: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 1.5rem;
-  background-color: ${(props: { bgColor: string }) =>
-    props.bgColor ? props.bgColor : "black"};
+const Container_Item = styled.div`
+  width: 100%;
 `;
 
 const App = () => {
-  const itemArray = ["red", "orange", "black", "purple"];
+  const [itemArray, setitemArray] = useRecoilState(dataAtom);
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
+    setitemArray((current) => {
+      return produce(current, (draft) => {
+        const moveItem = current.ITEM[result.source.index];
+        draft.ITEM.splice(result.source.index, 1);
+        if (result.destination) {
+          draft.ITEM.splice(result.destination?.index, 0, moveItem);
+        }
+      });
+    });
   };
   return (
-    <div className="Home">
+    <Home>
       <Container_Row>
-        <Row>
-          <RowRank bgColor={"#ff7675"}>S</RowRank>
-        </Row>
-        <Row>
-          <RowRank bgColor={"#ffeaa7"}>A</RowRank>
-        </Row>
-        <Row>
-          <RowRank bgColor={"#fab1a0"}>B</RowRank>
-        </Row>
-        <Row>
-          <RowRank bgColor={"#a29bfe"}>C</RowRank>
-        </Row>
-        <Row>
-          <RowRank bgColor={"#636e72"}>D</RowRank>
-        </Row>
+        <RowDrag
+          item={itemArray["S"]}
+          bgColor="#ff7675"
+          droppableId="S"
+        ></RowDrag>
+        <RowDrag
+          item={itemArray["A"]}
+          bgColor="#fdcb6e"
+          droppableId="A"
+        ></RowDrag>
+        <RowDrag
+          item={itemArray["B"]}
+          bgColor="#81ecec"
+          droppableId="B"
+        ></RowDrag>
+        <RowDrag
+          item={itemArray["C"]}
+          bgColor="#a29bfe"
+          droppableId="C"
+        ></RowDrag>
+        <RowDrag
+          item={itemArray["D"]}
+          bgColor="#636e72"
+          droppableId="D"
+        ></RowDrag>
       </Container_Row>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable">
-          {(provided, snapshot) => (
-            <Container_Item
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {itemArray.map((item, index) => (
-                <Draggable key={item} index={index} draggableId={item}>
-                  {(provided, snapshot) => (
-                    <ItemBox
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      bgColor={item}
-                    >
-                      {item}
-                    </ItemBox>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </Container_Item>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </div>
+      <Container_Item>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="ITEM" direction="horizontal">
+            {(provided, snapshot) => (
+              <DroppableItem
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                isDraggingOver={snapshot.isDraggingOver}
+              >
+                {itemArray.ITEM.map((item, index) => (
+                  <Draggable key={item} index={index} draggableId={item}>
+                    {(provided, snapshot) => (
+                      <DraggableItem
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        bgColor={item}
+                        draggableStyle={provided.draggableProps.style}
+                      >
+                        {item}
+                      </DraggableItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </DroppableItem>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </Container_Item>
+    </Home>
   );
 };
 
