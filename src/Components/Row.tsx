@@ -1,18 +1,17 @@
-import produce from "immer";
 import React, { useEffect } from "react";
 import {
   DragDropContext,
   Draggable,
   DraggingStyle,
   Droppable,
-  DropResult,
   NotDraggingStyle,
 } from "react-beautiful-dnd";
-import { SetterOrUpdater, useRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { DropResultPlus } from "../App";
 import { dataAtom } from "../Atom";
 
-const Row = styled.div`
+const RowContainer = styled.div`
   &:not(:last-child) {
     border-bottom: 1px solid black;
   }
@@ -43,7 +42,7 @@ export const DraggableItem = styled.div`
   width: 100px;
   height: 100px;
   background-color: ${(props: { bgColor: string }) =>
-    props.bgColor ? props.bgColor : "red"};
+    props.bgColor ? props.bgColor : "black"};
   border: 1px solid black;
   display: flex;
   justify-content: center;
@@ -55,31 +54,18 @@ export const DraggableItem = styled.div`
   })};
 `;
 
-const RowDrag = ({
+const Row = ({
   bgColor,
   droppableId,
   item,
+  onDragEnd,
 }: {
   bgColor: string;
   droppableId: "S" | "A" | "B" | "C" | "D";
   item: string[];
+  onDragEnd: (result: DropResultPlus) => void;
 }) => {
   const setitemArray = useSetRecoilState(dataAtom);
-
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
-    setitemArray((current) => {
-      return produce(current, (draft) => {
-        const moveItem = draft[droppableId][result.source.index];
-        draft[droppableId].splice(result.source.index, 1);
-        if (result.destination) {
-          draft[droppableId].splice(result.destination?.index, 0, moveItem);
-        }
-      });
-    });
-  };
 
   useEffect(() => {
     console.log("rendered" + droppableId);
@@ -87,11 +73,11 @@ const RowDrag = ({
 
   return (
     <>
-      <Row>
+      <RowContainer>
         <RowRank bgColor={bgColor}>{droppableId}</RowRank>
         <DragContainer>
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="S" direction="horizontal">
+            <Droppable droppableId={droppableId} direction="horizontal">
               {(provided, snapshot) => (
                 <DroppableItem
                   ref={provided.innerRef}
@@ -119,9 +105,9 @@ const RowDrag = ({
             </Droppable>
           </DragDropContext>
         </DragContainer>
-      </Row>
+      </RowContainer>
     </>
   );
 };
 
-export default React.memo(RowDrag);
+export default React.memo(Row);

@@ -1,17 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
-import {
-  DragDropContext,
-  Draggable,
-  DraggingStyle,
-  Droppable,
-  DropResult,
-  NotDraggingStyle,
-} from "react-beautiful-dnd";
+import { DropResult } from "react-beautiful-dnd";
 import produce from "immer";
 import { useRecoilState } from "recoil";
 import { dataAtom } from "./Atom";
-import RowDrag, { DroppableItem, DraggableItem } from "./Components/RowDrag";
+import Row from "./Components/Row";
+import Container_item from "./Components/ItemContainer";
 
 const Home = styled.div`
   width: 80vw;
@@ -28,86 +22,80 @@ const Container_Row = styled.div`
   grid-template-rows: repeat(5, 1fr);
   margin-bottom: 2rem;
 `;
-const Container_Item = styled.div`
-  width: 100%;
-`;
+
+export interface DropResultPlus extends DropResult {
+  source: {
+    droppableId: "S" | "A" | "B" | "C" | "D" | "ITEM";
+    index: number;
+  };
+}
 
 const App = () => {
   const [itemArray, setitemArray] = useRecoilState(dataAtom);
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
-    setitemArray((current) => {
-      return produce(current, (draft) => {
-        const moveItem = current.ITEM[result.source.index];
-        draft.ITEM.splice(result.source.index, 1);
-        if (result.destination) {
-          draft.ITEM.splice(result.destination?.index, 0, moveItem);
-        }
+  // 근데 이렇게 prop으로 함수를 전달하는거랑. 각자의 컴포넌트에서 정의하는거랑
+  // 성능차이가 구체적으로 어떻게나는거지.
+  // 각 컴포넌트에서 함수를 만들어주니까 그게 힘들겠지.
+
+  const onDragEnd = useCallback(
+    (result: DropResultPlus) => {
+      if (!result.destination) {
+        return;
+      }
+      console.log(result);
+      const { droppableId, index } = result.source;
+      setitemArray((current) => {
+        return produce(current, (draft) => {
+          const moveItem = draft[droppableId][index];
+          draft[droppableId].splice(index, 1);
+          if (result.destination) {
+            draft[droppableId].splice(result.destination?.index, 0, moveItem);
+          }
+        });
       });
-    });
-  };
+    },
+    [setitemArray]
+  );
+
   return (
     <Home>
       <Container_Row>
-        <RowDrag
+        <Row
+          onDragEnd={onDragEnd}
           item={itemArray["S"]}
           bgColor="#ff7675"
           droppableId="S"
-        ></RowDrag>
-        <RowDrag
+        ></Row>
+        <Row
+          onDragEnd={onDragEnd}
           item={itemArray["A"]}
           bgColor="#fdcb6e"
           droppableId="A"
-        ></RowDrag>
-        <RowDrag
+        ></Row>
+        <Row
+          onDragEnd={onDragEnd}
           item={itemArray["B"]}
           bgColor="#81ecec"
           droppableId="B"
-        ></RowDrag>
-        <RowDrag
+        ></Row>
+        <Row
+          onDragEnd={onDragEnd}
           item={itemArray["C"]}
           bgColor="#a29bfe"
           droppableId="C"
-        ></RowDrag>
-        <RowDrag
+        ></Row>
+        <Row
+          onDragEnd={onDragEnd}
           item={itemArray["D"]}
           bgColor="#636e72"
           droppableId="D"
-        ></RowDrag>
+        ></Row>
       </Container_Row>
-      <Container_Item>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="ITEM" direction="horizontal">
-            {(provided, snapshot) => (
-              <DroppableItem
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                isDraggingOver={snapshot.isDraggingOver}
-              >
-                {itemArray.ITEM.map((item, index) => (
-                  <Draggable key={item} index={index} draggableId={item}>
-                    {(provided, snapshot) => (
-                      <DraggableItem
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        bgColor={item}
-                        draggableStyle={provided.draggableProps.style}
-                      >
-                        {item}
-                      </DraggableItem>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </DroppableItem>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </Container_Item>
+      <Container_item
+        onDragEnd={onDragEnd}
+        item={itemArray.ITEM}
+        droppableId={"ITEM"}
+      ></Container_item>
     </Home>
   );
 };
