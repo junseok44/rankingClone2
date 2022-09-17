@@ -24,34 +24,32 @@ const ItemContainer = ({
 }) => {
   return (
     <Container_Item>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId={droppableId} direction="horizontal">
-          {(provided, snapshot) => (
-            <DroppableItem
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              isDraggingOver={snapshot.isDraggingOver}
-            >
-              {item.map((item, index) => (
-                <Draggable key={item} index={index} draggableId={item}>
-                  {(provided, snapshot) => (
-                    <DraggableItem
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      bgColor={item}
-                      draggableStyle={provided.draggableProps.style}
-                    >
-                      {item}
-                    </DraggableItem>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </DroppableItem>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <Droppable droppableId={droppableId} direction="horizontal">
+        {(provided, snapshot) => (
+          <DroppableItem
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            isDraggingOver={snapshot.isDraggingOver}
+          >
+            {item.map((item, index) => (
+              <Draggable key={item} index={index} draggableId={item}>
+                {(provided, snapshot) => (
+                  <DraggableItem
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    bgColor={item}
+                    draggableStyle={provided.draggableProps.style}
+                  >
+                    {item}
+                  </DraggableItem>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </DroppableItem>
+        )}
+      </Droppable>
     </Container_Item>
   );
 };

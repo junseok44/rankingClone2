@@ -33,6 +33,7 @@ const DragContainer = styled.div`
   width: 100%;
 `;
 export const DroppableItem = styled.div`
+  height: 100%;
   display: flex;
   overflow: auto;
   background-color: ${({ isDraggingOver }: { isDraggingOver: boolean }) =>
@@ -76,34 +77,32 @@ const Row = ({
       <RowContainer>
         <RowRank bgColor={bgColor}>{droppableId}</RowRank>
         <DragContainer>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId={droppableId} direction="horizontal">
-              {(provided, snapshot) => (
-                <DroppableItem
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  isDraggingOver={snapshot.isDraggingOver}
-                >
-                  {item.map((color, index) => (
-                    <Draggable key={color} index={index} draggableId={color}>
-                      {(provided, snapshot) => (
-                        <DraggableItem
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          bgColor={color}
-                          draggableStyle={provided.draggableProps.style}
-                        >
-                          {color}
-                        </DraggableItem>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </DroppableItem>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <Droppable droppableId={droppableId} direction="horizontal">
+            {(provided, snapshot) => (
+              <DroppableItem
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                isDraggingOver={snapshot.isDraggingOver}
+              >
+                {item.map((color, index) => (
+                  <Draggable key={color} index={index} draggableId={color}>
+                    {(provided, snapshot) => (
+                      <DraggableItem
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        bgColor={color}
+                        draggableStyle={provided.draggableProps.style}
+                      >
+                        {color}
+                      </DraggableItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </DroppableItem>
+            )}
+          </Droppable>
         </DragContainer>
       </RowContainer>
     </>
