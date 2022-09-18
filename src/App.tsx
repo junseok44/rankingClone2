@@ -6,6 +6,10 @@ import { useRecoilState } from "recoil";
 import { dataAtom } from "./Atom";
 import Row from "./Components/Row";
 import Container_item from "./Components/ItemContainer";
+import { useDispatch } from "react-redux";
+import { moveCrossLine, moveSingleLine } from "./modules/item";
+import { useSelector } from "react-redux";
+import { RootState } from ".";
 
 const Home = styled.div`
   width: 80vw;
@@ -35,61 +39,30 @@ export interface DropResultPlus extends DropResult {
 }
 
 const App = () => {
-  const [itemArray, setitemArray] = useRecoilState(dataAtom);
-
+  const itemArray = useSelector((state: RootState) => state.item);
+  const dispatch = useDispatch();
   // 근데 이렇게 prop으로 함수를 전달하는거랑. 각자의 컴포넌트에서 정의하는거랑
   // 성능차이가 구체적으로 어떻게나는거지.
   // 각 컴포넌트에서 함수를 만들어주니까 그게 힘들겠지.
 
-  // 또 다른 문제는. 배열에 만약 같은 아이템이 있어버리면. 하나 움직일때
-  // 다른 라인에 있는 애도 움직여버린다. 그건 왜그런거지?
-  // S라인에 있는 A를 선택해도. S가 움직여버리니까.
-  // DraggableId에 있는것이 똑같은 "string"으로 되어버려서.
-  // 내가 s라인에 있는걸 옮겨도 그걸 a라인에 있는 아이템으로 인식해버리는것.
+  const onDragEnd = useCallback((result: DropResultPlus) => {
+    console.log(result);
 
-  const onDragEnd = useCallback(
-    (result: DropResultPlus) => {
-      console.log(result);
-
-      if (!result.destination) {
-        console.log("no dest");
-        return;
-      }
-      // 왜 빈 배열로 가면 result.dest가 없는거지?
-      const {
-        source: { droppableId: sourceDropId, index: sourceIndex },
-        destination: { droppableId: destDropId, index: destIndex },
-      } = result;
-      if (sourceDropId === destDropId) {
-        if (sourceIndex === destIndex) return;
-        setitemArray((current) => {
-          return produce(current, (draft) => {
-            const moveItem = draft[sourceDropId][sourceIndex];
-            // 여기서 moveItem하는거는 불변성에 위배되지는 않나?
-            // 지금은 그냥 string이라서 괜찮지만. 객체인 경우에는?
-            // 지금은 produce를 활용하고 있기 때문에 이것도 괜찮지 않을까 싶다.
-            draft[sourceDropId].splice(sourceIndex, 1);
-            if (result.destination) {
-              draft[sourceDropId].splice(
-                result.destination?.index,
-                0,
-                moveItem
-              );
-            }
-          });
-        });
-      } else if (sourceDropId !== destDropId) {
-        setitemArray((current) =>
-          produce(current, (draft) => {
-            const moveItem = draft[sourceDropId][sourceIndex];
-            draft[sourceDropId].splice(sourceIndex, 1);
-            draft[destDropId].splice(destIndex, 0, moveItem);
-          })
-        );
-      }
-    },
-    [setitemArray]
-  );
+    if (!result.destination) {
+      console.log("no dest");
+      return;
+    }
+    // 왜 빈 배열로 가면 result.dest가 없는거지?
+    const {
+      source: { droppableId: sourceDropId, index: sourceIndex },
+      destination: { droppableId: destDropId, index: destIndex },
+    } = result;
+    if (sourceDropId === destDropId) {
+      dispatch(moveSingleLine(sourceDropId, sourceIndex, destIndex));
+    } else if (sourceDropId !== destDropId) {
+      dispatch(moveCrossLine(sourceDropId, destDropId, sourceIndex, destIndex));
+    }
+  }, []);
 
   return (
     <Home>
