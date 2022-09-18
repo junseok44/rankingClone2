@@ -36,8 +36,13 @@ export const DroppableItem = styled.div`
   height: 100%;
   display: flex;
   overflow: auto;
-  background-color: ${({ isDraggingOver }: { isDraggingOver: boolean }) =>
-    isDraggingOver ? "#a29bfe" : "#dfe6e9"};
+  background-color: ${({
+    isDraggingOver,
+    bgColor,
+  }: {
+    isDraggingOver: boolean;
+    bgColor: string;
+  }) => (isDraggingOver ? bgColor : "#dfe6e9")};
 `;
 export const DraggableItem = styled.div`
   width: 100px;
@@ -83,6 +88,7 @@ const Row = ({
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 isDraggingOver={snapshot.isDraggingOver}
+                bgColor={bgColor}
               >
                 {item.map((color, index) => (
                   <Draggable key={color} index={index} draggableId={color}>
