@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { moveCrossLine, moveSingleLine } from "./modules/item";
 import { useSelector } from "react-redux";
 import { RootState } from ".";
+import { Rankenum } from "./modules/item";
 
 const Home = styled.div`
   width: 80vw;
@@ -29,11 +30,11 @@ const Container_Row = styled.div`
 
 export interface DropResultPlus extends DropResult {
   source: {
-    droppableId: "S" | "A" | "B" | "C" | "D" | "ITEM";
+    droppableId: Rankenum;
     index: number;
   };
   destination: {
-    droppableId: "S" | "A" | "B" | "C" | "D" | "ITEM";
+    droppableId: Rankenum;
     index: number;
   };
 }
@@ -70,39 +71,39 @@ const App = () => {
         <Container_Row>
           <Row
             onDragEnd={onDragEnd}
-            item={itemArray["S"]}
+            item={itemArray[Rankenum.S]}
             bgColor="#ff7675"
-            droppableId="S"
+            droppableId={Rankenum.S}
           ></Row>
           <Row
             onDragEnd={onDragEnd}
-            item={itemArray["A"]}
+            item={itemArray[Rankenum.A]}
             bgColor="#fdcb6e"
-            droppableId="A"
+            droppableId={Rankenum.A}
           ></Row>
           <Row
             onDragEnd={onDragEnd}
-            item={itemArray["B"]}
+            item={itemArray[Rankenum.B]}
             bgColor="#81ecec"
-            droppableId="B"
+            droppableId={Rankenum.B}
           ></Row>
           <Row
             onDragEnd={onDragEnd}
-            item={itemArray["C"]}
+            item={itemArray[Rankenum.C]}
             bgColor="#a29bfe"
-            droppableId="C"
+            droppableId={Rankenum.C}
           ></Row>
           <Row
             onDragEnd={onDragEnd}
-            item={itemArray["D"]}
+            item={itemArray[Rankenum.D]}
             bgColor="#636e72"
-            droppableId="D"
+            droppableId={Rankenum.D}
           ></Row>
         </Container_Row>
         <Container_item
           onDragEnd={onDragEnd}
-          item={itemArray.ITEM}
-          droppableId={"ITEM"}
+          item={itemArray[Rankenum.ITEM]}
+          droppableId={Rankenum.ITEM}
         ></Container_item>
       </DragDropContext>
     </Home>

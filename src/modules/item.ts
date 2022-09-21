@@ -1,5 +1,31 @@
 import { produce } from "immer";
 
+interface TinitialState {
+  S: string[];
+  A: string[];
+  B: string[];
+  C: string[];
+  D: string[];
+  ITEM: string[];
+}
+
+interface Taction {
+  type: string;
+  sourceDropId: Rankenum;
+  destDropId: Rankenum;
+  sourceIndex: number;
+  destIndex: number;
+}
+
+export enum Rankenum {
+  "S" = "S",
+  "A" = "A",
+  "B" = "B",
+  "C" = "C",
+  "D" = "D",
+  "ITEM" = "ITEM",
+}
+
 const MOVE_SINGLELINE = "item/move/singleLine";
 const MOVE_CROSSLINE = "item/move/crossLine";
 
@@ -25,24 +51,6 @@ export const moveCrossLine = (
   sourceIndex,
   destIndex,
 });
-
-interface TinitialState {
-  S: string[];
-  A: string[];
-  B: string[];
-  C: string[];
-  D: string[];
-  ITEM: string[];
-}
-
-interface Taction {
-  type: string;
-  sourceDropId: "S" | "A" | "B" | "C" | "D";
-  destDropId: "S" | "A" | "B" | "C" | "D";
-  sourceIndex: number;
-  destIndex: number;
-}
-
 const initialState: TinitialState = {
   S: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
   A: [],
@@ -60,6 +68,19 @@ const initialState: TinitialState = {
     "#2d3436",
   ],
 };
+
+// const initialState1 = [
+//   {
+//     rank: Rankenum.S,
+//     bgColor: "#ff7675",
+//     array: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
+//   },
+//   {
+//     rank: Rankenum.,
+//     bgColor: "#ff7675",
+//     array: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
+//   },
+// ];
 
 export const itemReducer = (state = initialState, action: Taction) => {
   const { sourceDropId, destDropId, sourceIndex, destIndex } = action;
