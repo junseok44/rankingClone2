@@ -9,6 +9,13 @@ interface TinitialState {
   ITEM: string[];
 }
 
+interface rankObj {
+  rank: Rankenum;
+  bgColor: string;
+  item: string[];
+}
+type TinitialState1 = rankObj[];
+
 interface Taction {
   type: string;
   sourceDropId: Rankenum;
@@ -51,38 +58,68 @@ export const moveCrossLine = (
   sourceIndex,
   destIndex,
 });
-const initialState: TinitialState = {
-  S: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
-  A: [],
-  B: [],
-  C: [],
-  D: [],
-  ITEM: [
-    "red",
-    "orange",
-    "purple",
-    "pink",
-    "#9b59b6",
-    "#fab1a0",
-    "#00b894",
-    "#2d3436",
-  ],
-};
 
-// const initialState1 = [
-//   {
-//     rank: Rankenum.S,
-//     bgColor: "#ff7675",
-//     array: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
-//   },
-//   {
-//     rank: Rankenum.,
-//     bgColor: "#ff7675",
-//     array: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
-//   },
-// ];
+// const initialState: TinitialState = {
+//   S: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
+//   A: [],
+//   B: [],
+//   C: [],
+//   D: [],
+// ITEM: [
+//   "red",
+//   "orange",
+//   "purple",
+//   "pink",
+//   "#9b59b6",
+//   "#fab1a0",
+//   "#00b894",
+//   "#2d3436",
+// ],
+// };
 
-export const itemReducer = (state = initialState, action: Taction) => {
+const initialState1: TinitialState1 = [
+  {
+    rank: Rankenum.S,
+    bgColor: "#ff7675",
+    item: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
+  },
+  {
+    rank: Rankenum.A,
+    bgColor: "#fdcb6e",
+    item: [],
+  },
+  {
+    rank: Rankenum.B,
+    bgColor: "#81ecec",
+    item: [],
+  },
+  {
+    rank: Rankenum.C,
+    bgColor: "#a29bfe",
+    item: [],
+  },
+  {
+    rank: Rankenum.D,
+    bgColor: "#636e72",
+    item: [],
+  },
+  {
+    rank: Rankenum.ITEM,
+    bgColor: "#636e72",
+    item: [
+      "red",
+      "orange",
+      "purple",
+      "pink",
+      "#9b59b6",
+      "#fab1a0",
+      "#00b894",
+      "#2d3436",
+    ],
+  },
+];
+
+export const itemReducer = (state = initialState1, action: Taction) => {
   const { sourceDropId, destDropId, sourceIndex, destIndex } = action;
   switch (action.type) {
     case MOVE_SINGLELINE: {
@@ -90,17 +127,15 @@ export const itemReducer = (state = initialState, action: Taction) => {
       // 같은 droppid의 index에다가 밀어넣는것.
       if (sourceIndex === destIndex) return state;
       return produce(state, (draft) => {
-        const moveItem = draft[sourceDropId][sourceIndex];
-        draft[sourceDropId].splice(sourceIndex, 1);
-        draft[sourceDropId].splice(destIndex, 0, moveItem);
+        const moveObj = draft.find((item) => item.rank === sourceDropId);
+        if (!moveObj) return;
+        const moveItem = moveObj.item[sourceIndex];
+        moveObj.item.splice(sourceIndex, 1);
+        moveObj.item.splice(destIndex, 0, moveItem);
       });
     }
     case MOVE_CROSSLINE: {
-      return produce(state, (draft) => {
-        const moveItem = draft[sourceDropId][sourceIndex];
-        draft[sourceDropId].splice(sourceIndex, 1);
-        draft[destDropId].splice(destIndex, 0, moveItem);
-      });
+      return state;
     }
     default: {
       return state;

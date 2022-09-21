@@ -10,6 +10,7 @@ import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { DropResultPlus } from "../App";
 import { dataAtom } from "../Atom";
+import { Rankenum } from "../modules/item";
 
 const RowContainer = styled.div`
   &:not(:last-child) {
@@ -60,6 +61,20 @@ export const DraggableItem = styled.div`
   })};
 `;
 
+const SettingBtn = styled.div`
+  background-color: black;
+  width: 5%;
+  height: 100%;
+  border-right: 1px solid white;
+`;
+
+const MoveContainer = styled.div`
+  background-color: black;
+
+  width: 5%;
+  height: 100%;
+`;
+
 const Row = ({
   bgColor,
   droppableId,
@@ -67,7 +82,7 @@ const Row = ({
   onDragEnd,
 }: {
   bgColor: string;
-  droppableId: "S" | "A" | "B" | "C" | "D";
+  droppableId: Rankenum;
   item: string[];
   onDragEnd: (result: DropResultPlus) => void;
 }) => {
@@ -110,6 +125,8 @@ const Row = ({
             )}
           </Droppable>
         </DragContainer>
+        <SettingBtn></SettingBtn>
+        <MoveContainer></MoveContainer>
       </RowContainer>
     </>
   );

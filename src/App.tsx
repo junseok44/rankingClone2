@@ -1,9 +1,6 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import produce from "immer";
-import { useRecoilState } from "recoil";
-import { dataAtom } from "./Atom";
 import Row from "./Components/Row";
 import Container_item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
@@ -41,6 +38,7 @@ export interface DropResultPlus extends DropResult {
 
 const App = () => {
   const itemArray = useSelector((state: RootState) => state.item);
+  console.log(itemArray);
   const dispatch = useDispatch();
   // 근데 이렇게 prop으로 함수를 전달하는거랑. 각자의 컴포넌트에서 정의하는거랑
   // 성능차이가 구체적으로 어떻게나는거지.
@@ -69,40 +67,23 @@ const App = () => {
     <Home>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container_Row>
-          <Row
-            onDragEnd={onDragEnd}
-            item={itemArray[Rankenum.S]}
-            bgColor="#ff7675"
-            droppableId={Rankenum.S}
-          ></Row>
-          <Row
-            onDragEnd={onDragEnd}
-            item={itemArray[Rankenum.A]}
-            bgColor="#fdcb6e"
-            droppableId={Rankenum.A}
-          ></Row>
-          <Row
-            onDragEnd={onDragEnd}
-            item={itemArray[Rankenum.B]}
-            bgColor="#81ecec"
-            droppableId={Rankenum.B}
-          ></Row>
-          <Row
-            onDragEnd={onDragEnd}
-            item={itemArray[Rankenum.C]}
-            bgColor="#a29bfe"
-            droppableId={Rankenum.C}
-          ></Row>
-          <Row
-            onDragEnd={onDragEnd}
-            item={itemArray[Rankenum.D]}
-            bgColor="#636e72"
-            droppableId={Rankenum.D}
-          ></Row>
+          {itemArray
+            .filter((item) => item.rank !== Rankenum.ITEM)
+            .map((obj) => {
+              return (
+                <Row
+                  droppableId={obj.rank}
+                  item={obj.item}
+                  bgColor={obj.bgColor}
+                  onDragEnd={onDragEnd}
+                ></Row>
+              );
+            })}
         </Container_Row>
         <Container_item
           onDragEnd={onDragEnd}
-          item={itemArray[Rankenum.ITEM]}
+          item={itemArray.find((item) => item.rank === Rankenum.ITEM)?.item!}
+          // 이부분 그냥 row로 바꾸어버리자.
           droppableId={Rankenum.ITEM}
         ></Container_item>
       </DragDropContext>
