@@ -1,14 +1,5 @@
 import { produce } from "immer";
 
-interface TinitialState {
-  S: string[];
-  A: string[];
-  B: string[];
-  C: string[];
-  D: string[];
-  ITEM: string[];
-}
-
 interface rankObj {
   rank: Rankenum;
   bgColor: string;
@@ -58,24 +49,6 @@ export const moveCrossLine = (
   sourceIndex,
   destIndex,
 });
-
-// const initialState: TinitialState = {
-//   S: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
-//   A: [],
-//   B: [],
-//   C: [],
-//   D: [],
-// ITEM: [
-//   "red",
-//   "orange",
-//   "purple",
-//   "pink",
-//   "#9b59b6",
-//   "#fab1a0",
-//   "#00b894",
-//   "#2d3436",
-// ],
-// };
 
 const initialState1: TinitialState1 = [
   {
@@ -135,7 +108,14 @@ export const itemReducer = (state = initialState1, action: Taction) => {
       });
     }
     case MOVE_CROSSLINE: {
-      return state;
+      return produce(state, (draft) => {
+        const moveObj = draft.find((item) => item.rank === sourceDropId);
+        const destObj = draft.find((item) => item.rank === destDropId);
+        if (!moveObj) return;
+        const moveItem = moveObj.item[sourceIndex];
+        moveObj.item.splice(sourceIndex, 1);
+        destObj?.item.splice(destIndex, 0, moveItem);
+      });
     }
     default: {
       return state;

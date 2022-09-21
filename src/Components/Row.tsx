@@ -1,16 +1,19 @@
 import React, { useEffect } from "react";
 import {
-  DragDropContext,
   Draggable,
   DraggingStyle,
   Droppable,
   NotDraggingStyle,
 } from "react-beautiful-dnd";
-import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { DropResultPlus } from "../App";
-import { dataAtom } from "../Atom";
 import { Rankenum } from "../modules/item";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faGear,
+  faArrowUp,
+  faArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
 
 const RowContainer = styled.div`
   &:not(:last-child) {
@@ -66,13 +69,34 @@ const SettingBtn = styled.div`
   width: 5%;
   height: 100%;
   border-right: 1px solid white;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.5rem;
 `;
 
 const MoveContainer = styled.div`
   background-color: black;
-
   width: 5%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const MoveBtn = styled.div`
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid white;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.7;
+  }
 `;
 
 const Row = ({
@@ -86,8 +110,6 @@ const Row = ({
   item: string[];
   onDragEnd: (result: DropResultPlus) => void;
 }) => {
-  const setitemArray = useSetRecoilState(dataAtom);
-
   useEffect(() => {
     console.log("rendered" + droppableId);
   });
@@ -125,8 +147,17 @@ const Row = ({
             )}
           </Droppable>
         </DragContainer>
-        <SettingBtn></SettingBtn>
-        <MoveContainer></MoveContainer>
+        <SettingBtn>
+          <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
+        </SettingBtn>
+        <MoveContainer>
+          <MoveBtn>
+            <FontAwesomeIcon icon={faArrowUp}></FontAwesomeIcon>
+          </MoveBtn>
+          <MoveBtn>
+            <FontAwesomeIcon icon={faArrowDown}></FontAwesomeIcon>
+          </MoveBtn>
+        </MoveContainer>
       </RowContainer>
     </>
   );
