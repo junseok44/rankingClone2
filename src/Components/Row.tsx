@@ -103,12 +103,12 @@ const Row = ({
   bgColor,
   droppableId,
   item,
-  onDragEnd,
+  onRowMoveBtn,
 }: {
   bgColor: string;
   droppableId: Rankenum;
   item: string[];
-  onDragEnd: (result: DropResultPlus) => void;
+  onRowMoveBtn: (direction: string, droppableId: Rankenum) => void;
 }) => {
   useEffect(() => {
     console.log("rendered" + droppableId);
@@ -151,10 +151,10 @@ const Row = ({
           <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
         </SettingBtn>
         <MoveContainer>
-          <MoveBtn>
+          <MoveBtn onClick={() => onRowMoveBtn("up", droppableId)}>
             <FontAwesomeIcon icon={faArrowUp}></FontAwesomeIcon>
           </MoveBtn>
-          <MoveBtn>
+          <MoveBtn onClick={() => onRowMoveBtn("down", droppableId)}>
             <FontAwesomeIcon icon={faArrowDown}></FontAwesomeIcon>
           </MoveBtn>
         </MoveContainer>

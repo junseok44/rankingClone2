@@ -4,7 +4,12 @@ import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Row from "./Components/Row";
 import Container_item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
-import { moveCrossLine, moveSingleLine } from "./modules/item";
+import {
+  moveCrossLine,
+  moveRankbarDown,
+  moveRankbarUp,
+  moveSingleLine,
+} from "./modules/item";
 import { useSelector } from "react-redux";
 import { RootState } from ".";
 import { Rankenum } from "./modules/item";
@@ -63,6 +68,10 @@ const App = () => {
     }
   }, []);
 
+  const onRowMoveClick = (direction: string, droppableId: Rankenum): void => {
+    if (direction === "up") dispatch(moveRankbarUp(droppableId));
+    else if (direction === "down") dispatch(moveRankbarDown(droppableId));
+  };
   return (
     <Home>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -75,7 +84,7 @@ const App = () => {
                   droppableId={obj.rank}
                   item={obj.item}
                   bgColor={obj.bgColor}
-                  onDragEnd={onDragEnd}
+                  onRowMoveBtn={onRowMoveClick}
                 ></Row>
               );
             })}

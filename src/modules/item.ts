@@ -13,6 +13,7 @@ interface Taction {
   destDropId: Rankenum;
   sourceIndex: number;
   destIndex: number;
+  droppableId: Rankenum;
 }
 
 export enum Rankenum {
@@ -26,6 +27,8 @@ export enum Rankenum {
 
 const MOVE_SINGLELINE = "item/move/singleLine";
 const MOVE_CROSSLINE = "item/move/crossLine";
+const MOVE_RANKBAR_UP = "rank/move/up";
+const MOVE_RANKBAR_DOWN = "rank/move/down";
 
 export const moveSingleLine = (
   sourceDropId: string,
@@ -48,6 +51,14 @@ export const moveCrossLine = (
   destDropId,
   sourceIndex,
   destIndex,
+});
+export const moveRankbarUp = (droppableId: Rankenum) => ({
+  type: MOVE_RANKBAR_UP,
+  droppableId,
+});
+export const moveRankbarDown = (droppableId: Rankenum) => ({
+  type: MOVE_RANKBAR_DOWN,
+  droppableId,
 });
 
 const initialState1: TinitialState1 = [
@@ -115,6 +126,26 @@ export const itemReducer = (state = initialState1, action: Taction) => {
         const moveItem = moveObj.item[sourceIndex];
         moveObj.item.splice(sourceIndex, 1);
         destObj?.item.splice(destIndex, 0, moveItem);
+      });
+    }
+    case MOVE_RANKBAR_UP: {
+      return produce(state, (draft) => {
+        const moveObj = draft.find((obj) => obj.rank === action.droppableId);
+        if (!moveObj) return;
+        const index = draft.indexOf(moveObj);
+        if (index === 0) return;
+        draft.splice(index, 1);
+        draft.splice(index - 1, 0, moveObj);
+      });
+    }
+    case MOVE_RANKBAR_DOWN: {
+      return produce(state, (draft) => {
+        const moveObj = draft.find((obj) => obj.rank === action.droppableId);
+        if (!moveObj) return;
+        const index = draft.indexOf(moveObj);
+        if (index === draft.length - 1) return;
+        draft.splice(index, 1);
+        draft.splice(index + 1, 0, moveObj);
       });
     }
     default: {
