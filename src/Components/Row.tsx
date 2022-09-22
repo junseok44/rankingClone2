@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Draggable,
   DraggingStyle,
@@ -14,6 +14,8 @@ import {
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch } from "react-redux";
+import { changeSettingMode } from "../modules/mode";
 
 const RowContainer = styled.div`
   &:not(:last-child) {
@@ -38,6 +40,7 @@ const DragContainer = styled.div`
 `;
 export const DroppableItem = styled.div`
   height: 100%;
+  min-height: 10vh;
   display: flex;
   overflow: auto;
   background-color: ${({
@@ -113,7 +116,7 @@ const Row = ({
   useEffect(() => {
     console.log("rendered" + droppableId);
   });
-
+  const dispatch = useDispatch();
   return (
     <>
       <RowContainer>
@@ -147,7 +150,11 @@ const Row = ({
             )}
           </Droppable>
         </DragContainer>
-        <SettingBtn>
+        <SettingBtn
+          onClick={useCallback(() => {
+            dispatch(changeSettingMode());
+          }, [dispatch])}
+        >
           <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
         </SettingBtn>
         <MoveContainer>

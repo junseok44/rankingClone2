@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Row from "./Components/Row";
@@ -13,6 +13,18 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from ".";
 import { Rankenum } from "./modules/item";
+import { changeSettingMode } from "./modules/mode";
+
+export interface DropResultPlus extends DropResult {
+  source: {
+    droppableId: Rankenum;
+    index: number;
+  };
+  destination: {
+    droppableId: Rankenum;
+    index: number;
+  };
+}
 
 const Home = styled.div`
   width: 80vw;
@@ -30,24 +42,58 @@ const Container_Row = styled.div`
   margin-bottom: 2rem;
 `;
 
-export interface DropResultPlus extends DropResult {
-  source: {
-    droppableId: Rankenum;
-    index: number;
-  };
-  destination: {
-    droppableId: Rankenum;
-    index: number;
-  };
-}
+const SettingOverlay = styled.div`
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Setting = styled.div`
+  background-color: white;
+  width: 70vw;
+  height: 70vh;
+`;
+
+const SettingItem = styled.div`
+  background-color: pink;
+  height: 33%;
+`;
+
+const ColorContainer = styled.div`
+  display: flex;
+`;
+
+const ColorBox = styled.div`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: ${({ bgColor }: { bgColor: string }) =>
+    bgColor ? bgColor : "black"};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:not(:last-child) {
+    margin-right: 1rem;
+  }
+`;
+
+const SettingButton = styled.button`
+  width: 40%;
+  padding: 5px 15px;
+  background-color: grey;
+  border-radius: 5px;
+`;
 
 const App = () => {
   const itemArray = useSelector((state: RootState) => state.item);
-  console.log(itemArray);
+  const settingMode = useSelector((state: RootState) => state.mode.setting);
   const dispatch = useDispatch();
-  // 근데 이렇게 prop으로 함수를 전달하는거랑. 각자의 컴포넌트에서 정의하는거랑
-  // 성능차이가 구체적으로 어떻게나는거지.
-  // 각 컴포넌트에서 함수를 만들어주니까 그게 힘들겠지.
 
   const onDragEnd = useCallback((result: DropResultPlus) => {
     console.log(result);
@@ -96,6 +142,43 @@ const App = () => {
           droppableId={Rankenum.ITEM}
         ></Container_item>
       </DragDropContext>
+      {settingMode && (
+        <SettingOverlay onClick={() => dispatch(changeSettingMode())}>
+          <Setting
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation();
+            }}
+          >
+            <SettingItem>
+              <div>choose background color</div>
+              <ColorContainer>
+                {[
+                  "#FF6633",
+                  "#FFB399",
+                  "#FF33FF",
+                  "#FFFF99",
+                  "#00B3E6",
+                  "#E6B333",
+                  "#3366E6",
+                  "#999966",
+                ].map((color) => {
+                  return <ColorBox bgColor={color}>a</ColorBox>;
+                })}
+              </ColorContainer>
+            </SettingItem>
+            <SettingItem>
+              <div>edit label name</div>
+              <input type="text"></input>
+            </SettingItem>
+            <SettingItem>
+              <SettingButton>create</SettingButton>
+              <SettingButton>create</SettingButton>
+              <SettingButton>create</SettingButton>
+              <SettingButton>create</SettingButton>
+            </SettingItem>
+          </Setting>
+        </SettingOverlay>
+      )}
     </Home>
   );
 };

@@ -11,14 +11,19 @@
 <!-- 또 아이템 라인에서 다른 라인으로 이동이 안됨.
 이거는 dragdropContext를 동일한 것으로 바꿔놓음으로써 해결.  -->
 
+// 문제점
+
+1. 세팅 누를때마다 모든 row가 리렌더링된다. 왜?
+
 2-1. 리덕스 적용해보기.
 
 --> 일단 싱글라인부터. 그리고 disaptch는 컨테이너 없이 그냥 적용해보기.
 
---> typescript redux documentation 읽어보기.
---> 구체적으로 container라던지. 그 값을 제공해주는게 아니라 짬밥해서 쓰는중.
---> 지금 reducer action type 부분에서 에러가 나서 그냥 reducer를 any라고 해두긴 했음.
---> createSlice로도 한번 해보기.
+- typescript redux documentation 읽어보기.
+- 구체적으로 container라던지. 그 값을 제공해주는게 아니라 짬밥해서 쓰는중.
+- 지금 reducer action type 부분에서 에러가 나서 그냥 reducer를 any라고 해두긴 했음.
+  --> 이건 combineReducers를 통해서 해결함.
+- createSlice로도 한번 해보기.
 
 3. 이미지 만들어서 사용하는것
 

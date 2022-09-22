@@ -27,8 +27,8 @@ export enum Rankenum {
 
 const MOVE_SINGLELINE = "item/move/singleLine";
 const MOVE_CROSSLINE = "item/move/crossLine";
-const MOVE_RANKBAR_UP = "rank/move/up";
-const MOVE_RANKBAR_DOWN = "rank/move/down";
+const MOVE_RANKBAR_UP = "item/move/RankUp";
+const MOVE_RANKBAR_DOWN = "item/move/RankDown";
 
 export const moveSingleLine = (
   sourceDropId: string,

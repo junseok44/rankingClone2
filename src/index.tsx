@@ -7,9 +7,10 @@ import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { itemReducer } from "./modules/item";
 import { Provider } from "react-redux";
+import { mode } from "./modules/mode";
 
 const store = configureStore({
-  reducer: combineReducers({ item: itemReducer }),
+  reducer: combineReducers({ item: itemReducer, mode }),
 });
 
 const root = ReactDOM.createRoot(
