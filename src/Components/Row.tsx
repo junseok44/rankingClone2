@@ -6,7 +6,6 @@ import {
   NotDraggingStyle,
 } from "react-beautiful-dnd";
 import styled from "styled-components";
-import { DropResultPlus } from "../App";
 import { Rankenum } from "../modules/item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,7 +14,7 @@ import {
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
-import { changeSettingMode } from "../modules/mode";
+import { enterItemSetting } from "../modules/mode";
 
 const RowContainer = styled.div`
   &:not(:last-child) {
@@ -152,7 +151,7 @@ const Row = ({
         </DragContainer>
         <SettingBtn
           onClick={useCallback(() => {
-            dispatch(changeSettingMode());
+            dispatch(enterItemSetting(droppableId));
           }, [dispatch])}
         >
           <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>

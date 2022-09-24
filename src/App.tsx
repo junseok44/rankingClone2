@@ -5,6 +5,8 @@ import Row from "./Components/Row";
 import Container_item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
 import {
+  changeRankbarColor,
+  changeRankbarName,
   moveCrossLine,
   moveRankbarDown,
   moveRankbarUp,
@@ -13,7 +15,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from ".";
 import { Rankenum } from "./modules/item";
-import { changeSettingMode } from "./modules/mode";
+import { exitItemSetting } from "./modules/mode";
 
 export interface DropResultPlus extends DropResult {
   source: {
@@ -41,7 +43,6 @@ const Container_Row = styled.div`
   grid-template-rows: repeat(5, 1fr);
   margin-bottom: 2rem;
 `;
-
 const SettingOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.3);
   width: 100%;
@@ -53,46 +54,92 @@ const SettingOverlay = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
 const Setting = styled.div`
   background-color: white;
   width: 70vw;
   height: 70vh;
 `;
-
 const SettingItem = styled.div`
   background-color: pink;
   height: 33%;
+`;
+const SettingColor = styled(SettingItem)`
+  display: flex;
+  flex-direction: column;
+  & > h1 {
+    font-size: 2rem;
+  }
+  & > * {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+const SettingName = styled(SettingItem)`
+  & > h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  & > * {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  & > input {
+    margin: 0 auto;
+    width: 70%;
+    height: 2rem;
+  }
+`;
+const SettingBtnRow = styled.div`
+  background-color: pink;
+  height: 17%;
+  display: flex;
+  justify-content: center;
 `;
 
 const ColorContainer = styled.div`
   display: flex;
 `;
 
-const ColorBox = styled.div`
+interface ColorBoxProps {
+  bgColor: string;
+  currentColor: string;
+}
+const ColorBox = styled.div<{ bgColor: string; currentColor: string }>`
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background-color: ${({ bgColor }: { bgColor: string }) =>
-    bgColor ? bgColor : "black"};
+  background-color: ${(props: ColorBoxProps) =>
+    props.bgColor ? props.bgColor : "black"};
   display: flex;
+  border: ${(props: ColorBoxProps) =>
+    props.currentColor === props.bgColor ? "3px solid black" : "none"};
   justify-content: center;
   align-items: center;
+  cursor: pointer;
   &:not(:last-child) {
     margin-right: 1rem;
   }
 `;
 
-const SettingButton = styled.button`
+const SettingBtn = styled.button`
   width: 40%;
   padding: 5px 15px;
-  background-color: grey;
+  background-color: #dfe6e9;
   border-radius: 5px;
+  max-height: 2.5rem;
+  cursor: pointer;
 `;
 
 const App = () => {
   const itemArray = useSelector((state: RootState) => state.item);
   const settingMode = useSelector((state: RootState) => state.mode.setting);
+  const currentSettingRow = useSelector(
+    (state: RootState) => state.mode.currentSettingItem
+  );
   const dispatch = useDispatch();
 
   const onDragEnd = useCallback((result: DropResultPlus) => {
@@ -117,6 +164,12 @@ const App = () => {
   const onRowMoveClick = (direction: string, droppableId: Rankenum): void => {
     if (direction === "up") dispatch(moveRankbarUp(droppableId));
     else if (direction === "down") dispatch(moveRankbarDown(droppableId));
+  };
+  const onChangeRowColor = (color: string) => {
+    dispatch(changeRankbarColor(color, currentSettingRow));
+  };
+  const onChangeRowName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("rejecte");
   };
   return (
     <Home>
@@ -143,14 +196,14 @@ const App = () => {
         ></Container_item>
       </DragDropContext>
       {settingMode && (
-        <SettingOverlay onClick={() => dispatch(changeSettingMode())}>
+        <SettingOverlay onClick={() => dispatch(exitItemSetting())}>
           <Setting
             onClick={(e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation();
             }}
           >
-            <SettingItem>
-              <div>choose background color</div>
+            <SettingColor>
+              <h1>choose background color</h1>
               <ColorContainer>
                 {[
                   "#FF6633",
@@ -162,20 +215,35 @@ const App = () => {
                   "#3366E6",
                   "#999966",
                 ].map((color) => {
-                  return <ColorBox bgColor={color}>a</ColorBox>;
+                  return (
+                    <ColorBox
+                      currentColor={
+                        itemArray.find((obj) => obj.rank === currentSettingRow)
+                          ?.bgColor
+                      }
+                      bgColor={color}
+                      onClick={() => onChangeRowColor(color)}
+                    ></ColorBox>
+                  );
                 })}
               </ColorContainer>
-            </SettingItem>
-            <SettingItem>
-              <div>edit label name</div>
-              <input type="text"></input>
-            </SettingItem>
-            <SettingItem>
-              <SettingButton>create</SettingButton>
-              <SettingButton>create</SettingButton>
-              <SettingButton>create</SettingButton>
-              <SettingButton>create</SettingButton>
-            </SettingItem>
+            </SettingColor>
+            <SettingName>
+              <h1>edit label name</h1>
+              <input
+                type="text"
+                placeholder={currentSettingRow!}
+                onChange={onChangeRowName}
+              ></input>
+            </SettingName>
+            <SettingBtnRow>
+              <SettingBtn>Delete Row</SettingBtn>
+              <SettingBtn>Clear Row Images</SettingBtn>
+            </SettingBtnRow>
+            <SettingBtnRow>
+              <SettingBtn>Add a Row above</SettingBtn>
+              <SettingBtn>Add a Row below</SettingBtn>
+            </SettingBtnRow>
           </Setting>
         </SettingOverlay>
       )}

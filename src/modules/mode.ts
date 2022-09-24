@@ -1,17 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Action } from "redux-actions";
 
 const slice = createSlice({
   name: "mode",
   initialState: {
     setting: false,
+    currentSettingItem: null,
   },
   reducers: {
-    changeSettingMode(state) {
+    enterItemSetting(state, action) {
+      state.setting = true;
+      state.currentSettingItem = action.payload;
+    },
+    exitItemSetting(state) {
       state.setting = !state.setting;
     },
   },
 });
 
-export const { changeSettingMode } = slice.actions;
+export const { exitItemSetting, enterItemSetting } = slice.actions;
 export const { reducer: mode } = slice;

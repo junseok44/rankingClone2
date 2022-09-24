@@ -14,6 +14,9 @@ interface Taction {
   sourceIndex: number;
   destIndex: number;
   droppableId: Rankenum;
+  color: string;
+  name: Rankenum;
+  currentSettingRow: Rankenum;
 }
 
 export enum Rankenum {
@@ -29,6 +32,8 @@ const MOVE_SINGLELINE = "item/move/singleLine";
 const MOVE_CROSSLINE = "item/move/crossLine";
 const MOVE_RANKBAR_UP = "item/move/RankUp";
 const MOVE_RANKBAR_DOWN = "item/move/RankDown";
+const CHANGE_RANKBAR_COLOR = "rank/change/Color";
+const CHANGE_RANKBAR_NAME = "rank/change/Name";
 
 export const moveSingleLine = (
   sourceDropId: string,
@@ -60,31 +65,47 @@ export const moveRankbarDown = (droppableId: Rankenum) => ({
   type: MOVE_RANKBAR_DOWN,
   droppableId,
 });
+export const changeRankbarColor = (
+  color: string,
+  currentSettingRow: Rankenum | null
+) => ({
+  type: CHANGE_RANKBAR_COLOR,
+  color,
+  currentSettingRow,
+});
+export const changeRankbarName = (
+  name: Rankenum,
+  currentSettingRow: Rankenum
+) => ({
+  type: CHANGE_RANKBAR_NAME,
+  name,
+  currentSettingRow,
+});
 
 const initialState1: TinitialState1 = [
   {
     rank: Rankenum.S,
-    bgColor: "#ff7675",
+    bgColor: "#FF6633",
     item: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
   },
   {
     rank: Rankenum.A,
-    bgColor: "#fdcb6e",
+    bgColor: "#FFB399",
     item: [],
   },
   {
     rank: Rankenum.B,
-    bgColor: "#81ecec",
+    bgColor: "#FF33FF",
     item: [],
   },
   {
     rank: Rankenum.C,
-    bgColor: "#a29bfe",
+    bgColor: "#FFFF99",
     item: [],
   },
   {
     rank: Rankenum.D,
-    bgColor: "#636e72",
+    bgColor: "#00B3E6",
     item: [],
   },
   {
@@ -147,6 +168,16 @@ export const itemReducer = (state = initialState1, action: Taction) => {
         draft.splice(index, 1);
         draft.splice(index + 1, 0, moveObj);
       });
+    }
+    case CHANGE_RANKBAR_COLOR: {
+      return produce(state, (draft) => {
+        const obj1 = draft.find((obj) => obj.rank === action.currentSettingRow);
+        if (!obj1) return;
+        obj1.bgColor = action.color;
+      });
+    }
+    case CHANGE_RANKBAR_NAME: {
+      return state;
     }
     default: {
       return state;
