@@ -105,11 +105,13 @@ const Row = ({
   bgColor,
   droppableId,
   item,
+  id,
   onRowMoveBtn,
 }: {
   bgColor: string;
   droppableId: Rankenum;
   item: string[];
+  id: string;
   onRowMoveBtn: (direction: string, droppableId: Rankenum) => void;
 }) => {
   useEffect(() => {
@@ -151,7 +153,7 @@ const Row = ({
         </DragContainer>
         <SettingBtn
           onClick={useCallback(() => {
-            dispatch(enterItemSetting(droppableId));
+            dispatch(enterItemSetting(id));
           }, [dispatch])}
         >
           <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>

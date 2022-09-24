@@ -24,6 +24,8 @@ currentSettingRow를 rank가 아닌 id로 설정해서
 
 앞으로 조회할때는 id를 사용해서 조회할 수 있도록.
 
+droppableId도 id로 바꾸자. 그러면 무슨 일이 일어나는가? 이동은 제대로 되는가?
+
 - colorbox에서는 그 currentSettingRow의 bgColor를 조회해서. 걔랑 맞는 컬러박스에는 동그라미
 
 - changeRowColor에서는 바꿀 색깔하고.

@@ -1,9 +1,10 @@
 import { produce } from "immer";
 
 interface rankObj {
-  rank: Rankenum;
+  name: any;
   bgColor: string;
   item: string[];
+  id: string;
 }
 type TinitialState1 = rankObj[];
 
@@ -45,6 +46,7 @@ export const moveSingleLine = (
   sourceIndex,
   destIndex,
 });
+
 export const moveCrossLine = (
   sourceDropId: string,
   destDropId: string,
@@ -57,22 +59,26 @@ export const moveCrossLine = (
   sourceIndex,
   destIndex,
 });
+
 export const moveRankbarUp = (droppableId: Rankenum) => ({
   type: MOVE_RANKBAR_UP,
   droppableId,
 });
+
 export const moveRankbarDown = (droppableId: Rankenum) => ({
   type: MOVE_RANKBAR_DOWN,
   droppableId,
 });
+
 export const changeRankbarColor = (
   color: string,
-  currentSettingRow: Rankenum | null
+  currentSettingRow: string | null
 ) => ({
   type: CHANGE_RANKBAR_COLOR,
   color,
   currentSettingRow,
 });
+
 export const changeRankbarName = (
   name: Rankenum,
   currentSettingRow: Rankenum
@@ -84,33 +90,39 @@ export const changeRankbarName = (
 
 const initialState1: TinitialState1 = [
   {
-    rank: Rankenum.S,
+    name: Rankenum.S,
+    id: "6158222534814353",
     bgColor: "#FF6633",
     item: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
   },
   {
-    rank: Rankenum.A,
+    name: Rankenum.A,
+    id: "8040881574028147",
     bgColor: "#FFB399",
     item: [],
   },
   {
-    rank: Rankenum.B,
+    name: Rankenum.B,
+    id: "5214879317176004",
     bgColor: "#FF33FF",
     item: [],
   },
   {
-    rank: Rankenum.C,
+    name: Rankenum.C,
+    id: "8189987661048699",
     bgColor: "#FFFF99",
     item: [],
   },
   {
-    rank: Rankenum.D,
+    name: Rankenum.D,
+    id: "5335203244999249",
     bgColor: "#00B3E6",
     item: [],
   },
   {
-    rank: Rankenum.ITEM,
+    name: Rankenum.ITEM,
     bgColor: "#636e72",
+    id: "5539690055555553",
     item: [
       "red",
       "orange",
@@ -132,7 +144,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
       // 같은 droppid의 index에다가 밀어넣는것.
       if (sourceIndex === destIndex) return state;
       return produce(state, (draft) => {
-        const moveObj = draft.find((item) => item.rank === sourceDropId);
+        const moveObj = draft.find((item) => item.name === sourceDropId);
         if (!moveObj) return;
         const moveItem = moveObj.item[sourceIndex];
         moveObj.item.splice(sourceIndex, 1);
@@ -141,8 +153,8 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case MOVE_CROSSLINE: {
       return produce(state, (draft) => {
-        const moveObj = draft.find((item) => item.rank === sourceDropId);
-        const destObj = draft.find((item) => item.rank === destDropId);
+        const moveObj = draft.find((item) => item.name === sourceDropId);
+        const destObj = draft.find((item) => item.name === destDropId);
         if (!moveObj) return;
         const moveItem = moveObj.item[sourceIndex];
         moveObj.item.splice(sourceIndex, 1);
@@ -151,7 +163,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case MOVE_RANKBAR_UP: {
       return produce(state, (draft) => {
-        const moveObj = draft.find((obj) => obj.rank === action.droppableId);
+        const moveObj = draft.find((obj) => obj.name === action.droppableId);
         if (!moveObj) return;
         const index = draft.indexOf(moveObj);
         if (index === 0) return;
@@ -161,7 +173,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case MOVE_RANKBAR_DOWN: {
       return produce(state, (draft) => {
-        const moveObj = draft.find((obj) => obj.rank === action.droppableId);
+        const moveObj = draft.find((obj) => obj.name === action.droppableId);
         if (!moveObj) return;
         const index = draft.indexOf(moveObj);
         if (index === draft.length - 1) return;
@@ -171,7 +183,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case CHANGE_RANKBAR_COLOR: {
       return produce(state, (draft) => {
-        const obj1 = draft.find((obj) => obj.rank === action.currentSettingRow);
+        const obj1 = draft.find((obj) => obj.id === action.currentSettingRow);
         if (!obj1) return;
         obj1.bgColor = action.color;
       });

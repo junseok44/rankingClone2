@@ -140,6 +140,7 @@ const App = () => {
   const currentSettingRow = useSelector(
     (state: RootState) => state.mode.currentSettingItem
   );
+  // 이제 currentSettingRow는 string으로 된 id입니다.
   const dispatch = useDispatch();
 
   const onDragEnd = useCallback((result: DropResultPlus) => {
@@ -161,7 +162,7 @@ const App = () => {
     }
   }, []);
 
-  const onRowMoveClick = (direction: string, droppableId: Rankenum): void => {
+  const onRowMoveBtn = (direction: string, droppableId: Rankenum): void => {
     if (direction === "up") dispatch(moveRankbarUp(droppableId));
     else if (direction === "down") dispatch(moveRankbarDown(droppableId));
   };
@@ -176,21 +177,22 @@ const App = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <Container_Row>
           {itemArray
-            .filter((item) => item.rank !== Rankenum.ITEM)
+            .filter((item) => item.name !== Rankenum.ITEM)
             .map((obj) => {
               return (
                 <Row
-                  droppableId={obj.rank}
+                  droppableId={obj.name}
                   item={obj.item}
                   bgColor={obj.bgColor}
-                  onRowMoveBtn={onRowMoveClick}
+                  id={obj.id}
+                  onRowMoveBtn={onRowMoveBtn}
                 ></Row>
               );
             })}
         </Container_Row>
         <Container_item
           onDragEnd={onDragEnd}
-          item={itemArray.find((item) => item.rank === Rankenum.ITEM)?.item!}
+          item={itemArray.find((item) => item.name === Rankenum.ITEM)?.item!}
           // 이부분 그냥 row로 바꾸어버리자.
           droppableId={Rankenum.ITEM}
         ></Container_item>
@@ -218,7 +220,7 @@ const App = () => {
                   return (
                     <ColorBox
                       currentColor={
-                        itemArray.find((obj) => obj.rank === currentSettingRow)
+                        itemArray.find((obj) => obj.id === currentSettingRow)
                           ?.bgColor
                       }
                       bgColor={color}
@@ -232,7 +234,9 @@ const App = () => {
               <h1>edit label name</h1>
               <input
                 type="text"
-                placeholder={currentSettingRow!}
+                placeholder={
+                  itemArray.find((obj) => obj.id === currentSettingRow)?.name
+                }
                 onChange={onChangeRowName}
               ></input>
             </SettingName>
