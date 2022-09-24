@@ -1,48 +1,51 @@
-<!-- 1. 일단 한 라인에서 이동하는것 -->
-
-<!-- 2. 크로스 라인 이동하는것
-
--->
-
-<!-- 지금 문제는 아이템이 없는 라인으로 이동이 안됨.
--->
-<!-- 왜냐하면 아이템이 없으니까 height가 0이 되거든. -->
-
-<!-- 또 아이템 라인에서 다른 라인으로 이동이 안됨.
-이거는 dragdropContext를 동일한 것으로 바꿔놓음으로써 해결.  -->
-
 // 문제점& 개선할점.
 
 1. 세팅 누를때마다 모든 row가 리렌더링된다. 왜?
 
-2. setting 관련해서. 너무 누더기다. 뭐가 뭔지 정리할 필요
+내가볼때는. onRowMoveBtn이 계속 다시 만들어지고 있어서
+useCallback쓰면 될듯 하다. --> ok 해결됨.
 
-- 일단 세팅에 들어간다. 그러면
-  currentSettingRow가 그 droppableId (Rankenum)으로 세팅
+왜 계속 만들어지는가?
 
-currentSettingRow를 rank가 아닌 id로 설정해서
+컴포넌트가 렌더링 되는 이유
 
-앞으로 조회할때는 id를 사용해서 조회할 수 있도록.
+1. state가 바뀔때
+2. props가 바뀔때.
+3. 부모 컴포넌트가 렌더링될때.
+4. 강제 리렌더링.
 
-droppableId도 id로 바꾸자. 그러면 무슨 일이 일어나는가? 이동은 제대로 되는가?
+근데 app의 경우 itemArray가 바뀌는데도
+re-rendering되지는 않네?
+--> ㄴㄴ 얘도 된다. 근데 필요한가? 왜 되지?
 
-- colorbox에서는 그 currentSettingRow의 bgColor를 조회해서. 걔랑 맞는 컬러박스에는 동그라미
+5. DeleteRow에서 두개까지는 잘 지워지는데
+   그 다음부터 에러가 생김.
+   아무래도 overlay들어갈때,
+   !를 쓴게 문제였다.
 
-- changeRowColor에서는 바꿀 색깔하고.
-  currentSettingRow(Rankenum)을 전해준다.
+그리고 스타일 측면에서
 
-- 그러면 obj 중에서 rank가 currentSettingRow와 같은것을 찾아서 bgColor를 color로 변경해준다.
+item이 삭제되면 row가 줄어든다.
+그게 아니라 그냥 고정된 걸 쓰고싶다
+min-height가 아니라 그냥 height를 쓰자.
 
---> 문제는 지금. rank의 이름이 droppableId로 되어있다.
+그리고 row 추가되었을때
+body의 height랑. 또 grid-auto-height도 추가할 필요가 있다.
 
-그 row의 droppableId를 rank로 놔두고.
-이름만 바꾸도록 해도 괜찮은건가?
+3. refactoring도 누더기다..
 
-DeleteRow의 경우
+<!-- 일단 settingOverlay 분리하고 -->
 
-ClearRowImages의 경우
---> 그냥 그 row 찾아서 item다 지워주면 되고.
-Add a Row의 경우.
+또 draggable도 분리하고.
+
+변수 이름도 좀 더 정확하게 할 필요가 있다.
+currentSettingRowId로 하던지
+아니면 그냥 obj로 하던지.
+
+currentSettingRowId! 이것도
+어떻게 고칠 방법이 없을까.
+
+action에 불필요한것은 없는가/
 
 3. Taction을 지금 계속 추가하고 있는디.. 이거밖에
    방법이 없는건가?

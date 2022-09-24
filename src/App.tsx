@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Row from "./Components/Row";
@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import {
   changeRankbarColor,
   changeRankbarName,
+  clearRankbarItem,
+  deleteRankbar,
   moveCrossLine,
   moveRankbarDown,
   moveRankbarUp,
@@ -15,15 +17,16 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from ".";
 import { Rankenum } from "./modules/item";
+import Overlay from "./Components/Overlay";
 import { exitItemSetting } from "./modules/mode";
 
 export interface DropResultPlus extends DropResult {
   source: {
-    droppableId: Rankenum;
+    droppableId: string;
     index: number;
   };
   destination: {
-    droppableId: Rankenum;
+    droppableId: string;
     index: number;
   };
 }
@@ -43,105 +46,19 @@ const Container_Row = styled.div`
   grid-template-rows: repeat(5, 1fr);
   margin-bottom: 2rem;
 `;
-const SettingOverlay = styled.div`
-  background-color: rgba(0, 0, 0, 0.3);
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-const Setting = styled.div`
-  background-color: white;
-  width: 70vw;
-  height: 70vh;
-`;
-const SettingItem = styled.div`
-  background-color: pink;
-  height: 33%;
-`;
-const SettingColor = styled(SettingItem)`
-  display: flex;
-  flex-direction: column;
-  & > h1 {
-    font-size: 2rem;
-  }
-  & > * {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-`;
-const SettingName = styled(SettingItem)`
-  & > h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-  & > * {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  & > input {
-    margin: 0 auto;
-    width: 70%;
-    height: 2rem;
-  }
-`;
-const SettingBtnRow = styled.div`
-  background-color: pink;
-  height: 17%;
-  display: flex;
-  justify-content: center;
-`;
-
-const ColorContainer = styled.div`
-  display: flex;
-`;
-
-interface ColorBoxProps {
-  bgColor: string;
-  currentColor: string;
-}
-const ColorBox = styled.div<{ bgColor: string; currentColor: string }>`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background-color: ${(props: ColorBoxProps) =>
-    props.bgColor ? props.bgColor : "black"};
-  display: flex;
-  border: ${(props: ColorBoxProps) =>
-    props.currentColor === props.bgColor ? "3px solid black" : "none"};
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  &:not(:last-child) {
-    margin-right: 1rem;
-  }
-`;
-
-const SettingBtn = styled.button`
-  width: 40%;
-  padding: 5px 15px;
-  background-color: #dfe6e9;
-  border-radius: 5px;
-  max-height: 2.5rem;
-  cursor: pointer;
-`;
 
 const App = () => {
   const itemArray = useSelector((state: RootState) => state.item);
   const settingMode = useSelector((state: RootState) => state.mode.setting);
-  const currentSettingRow = useSelector(
+  const currentSettingRowId = useSelector(
     (state: RootState) => state.mode.currentSettingItem
   );
-  // 이제 currentSettingRow는 string으로 된 id입니다.
+  // 이제 currentSettingRowId는 string으로 된 id입니다.
+  // 근데 그것보다는 그냥 currentSe
   const dispatch = useDispatch();
+  useEffect(() => {
+    console.log("app home rendered");
+  });
 
   const onDragEnd = useCallback((result: DropResultPlus) => {
     console.log(result);
@@ -161,16 +78,28 @@ const App = () => {
       dispatch(moveCrossLine(sourceDropId, destDropId, sourceIndex, destIndex));
     }
   }, []);
+  const onRowMoveBtn = useCallback(
+    (direction: string, droppableId: string): void => {
+      if (direction === "up") dispatch(moveRankbarUp(droppableId));
+      else if (direction === "down") dispatch(moveRankbarDown(droppableId));
+    },
+    [dispatch, moveRankbarUp, moveRankbarDown]
+  );
 
-  const onRowMoveBtn = (direction: string, droppableId: Rankenum): void => {
-    if (direction === "up") dispatch(moveRankbarUp(droppableId));
-    else if (direction === "down") dispatch(moveRankbarDown(droppableId));
-  };
   const onChangeRowColor = (color: string) => {
-    dispatch(changeRankbarColor(color, currentSettingRow));
+    dispatch(changeRankbarColor(color, currentSettingRowId));
   };
   const onChangeRowName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("rejecte");
+    console.log(e.target.value);
+    dispatch(changeRankbarName(e.target.value, currentSettingRowId));
+  };
+  const onDeleteRow = () => {
+    dispatch(exitItemSetting());
+    dispatch(deleteRankbar(currentSettingRowId!));
+    // 여기서 ! 해주는것도 좋지 않은것같은데 따로 처리해줄 수 있나.
+  };
+  const onClearRowItem = () => {
+    dispatch(clearRankbarItem(currentSettingRowId!));
   };
   return (
     <Home>
@@ -181,10 +110,11 @@ const App = () => {
             .map((obj) => {
               return (
                 <Row
-                  droppableId={obj.name}
-                  item={obj.item}
+                  key={obj.id}
+                  droppableId={obj.id}
+                  name={obj.name}
+                  itemArray={obj.item}
                   bgColor={obj.bgColor}
-                  id={obj.id}
                   onRowMoveBtn={onRowMoveBtn}
                 ></Row>
               );
@@ -194,62 +124,19 @@ const App = () => {
           onDragEnd={onDragEnd}
           item={itemArray.find((item) => item.name === Rankenum.ITEM)?.item!}
           // 이부분 그냥 row로 바꾸어버리자.
-          droppableId={Rankenum.ITEM}
+          droppableId={
+            itemArray.find((item) => item.name === Rankenum.ITEM)?.id!
+          }
         ></Container_item>
       </DragDropContext>
       {settingMode && (
-        <SettingOverlay onClick={() => dispatch(exitItemSetting())}>
-          <Setting
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-              e.stopPropagation();
-            }}
-          >
-            <SettingColor>
-              <h1>choose background color</h1>
-              <ColorContainer>
-                {[
-                  "#FF6633",
-                  "#FFB399",
-                  "#FF33FF",
-                  "#FFFF99",
-                  "#00B3E6",
-                  "#E6B333",
-                  "#3366E6",
-                  "#999966",
-                ].map((color) => {
-                  return (
-                    <ColorBox
-                      currentColor={
-                        itemArray.find((obj) => obj.id === currentSettingRow)
-                          ?.bgColor
-                      }
-                      bgColor={color}
-                      onClick={() => onChangeRowColor(color)}
-                    ></ColorBox>
-                  );
-                })}
-              </ColorContainer>
-            </SettingColor>
-            <SettingName>
-              <h1>edit label name</h1>
-              <input
-                type="text"
-                placeholder={
-                  itemArray.find((obj) => obj.id === currentSettingRow)?.name
-                }
-                onChange={onChangeRowName}
-              ></input>
-            </SettingName>
-            <SettingBtnRow>
-              <SettingBtn>Delete Row</SettingBtn>
-              <SettingBtn>Clear Row Images</SettingBtn>
-            </SettingBtnRow>
-            <SettingBtnRow>
-              <SettingBtn>Add a Row above</SettingBtn>
-              <SettingBtn>Add a Row below</SettingBtn>
-            </SettingBtnRow>
-          </Setting>
-        </SettingOverlay>
+        <Overlay
+          currentObj={itemArray.find((obj) => obj.id === currentSettingRowId)!}
+          onDeleteRow={onDeleteRow}
+          onClearRowItem={onClearRowItem}
+          onChangeRowName={onChangeRowName}
+          onChangeRowColor={onChangeRowColor}
+        ></Overlay>
       )}
     </Home>
   );

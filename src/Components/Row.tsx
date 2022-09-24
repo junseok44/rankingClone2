@@ -104,15 +104,15 @@ const MoveBtn = styled.div`
 const Row = ({
   bgColor,
   droppableId,
-  item,
-  id,
+  itemArray,
+  name,
   onRowMoveBtn,
 }: {
   bgColor: string;
-  droppableId: Rankenum;
-  item: string[];
-  id: string;
-  onRowMoveBtn: (direction: string, droppableId: Rankenum) => void;
+  droppableId: string;
+  itemArray: string[];
+  name: string;
+  onRowMoveBtn: (direction: string, droppableId: string) => void;
 }) => {
   useEffect(() => {
     console.log("rendered" + droppableId);
@@ -121,7 +121,7 @@ const Row = ({
   return (
     <>
       <RowContainer>
-        <RowRank bgColor={bgColor}>{droppableId}</RowRank>
+        <RowRank bgColor={bgColor}>{name}</RowRank>
         <DragContainer>
           <Droppable droppableId={droppableId} direction="horizontal">
             {(provided, snapshot) => (
@@ -131,7 +131,7 @@ const Row = ({
                 isDraggingOver={snapshot.isDraggingOver}
                 bgColor={bgColor}
               >
-                {item.map((color, index) => (
+                {itemArray.map((color, index) => (
                   <Draggable key={color} index={index} draggableId={color}>
                     {(provided, snapshot) => (
                       <DraggableItem
@@ -153,7 +153,7 @@ const Row = ({
         </DragContainer>
         <SettingBtn
           onClick={useCallback(() => {
-            dispatch(enterItemSetting(id));
+            dispatch(enterItemSetting(droppableId));
           }, [dispatch])}
         >
           <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>

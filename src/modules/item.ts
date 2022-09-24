@@ -1,6 +1,6 @@
 import { produce } from "immer";
 
-interface rankObj {
+export interface rankObj {
   name: any;
   bgColor: string;
   item: string[];
@@ -10,14 +10,14 @@ type TinitialState1 = rankObj[];
 
 interface Taction {
   type: string;
-  sourceDropId: Rankenum;
-  destDropId: Rankenum;
+  sourceDropId: string;
+  destDropId: string;
   sourceIndex: number;
   destIndex: number;
-  droppableId: Rankenum;
+  droppableId: string;
   color: string;
-  name: Rankenum;
-  currentSettingRow: Rankenum;
+  name: string;
+  currentSettingRowId: string;
 }
 
 export enum Rankenum {
@@ -35,6 +35,10 @@ const MOVE_RANKBAR_UP = "item/move/RankUp";
 const MOVE_RANKBAR_DOWN = "item/move/RankDown";
 const CHANGE_RANKBAR_COLOR = "rank/change/Color";
 const CHANGE_RANKBAR_NAME = "rank/change/Name";
+const DELETE_RANKBAR = "rank/delete";
+const CLEAR_RANKBAR_ITEM = "rank/clear/item";
+const CREATE_RANKBAR_UP = "rank/create/up";
+const CREATE_RANKBAR_DOWN = "rank/create/down";
 
 export const moveSingleLine = (
   sourceDropId: string,
@@ -60,33 +64,45 @@ export const moveCrossLine = (
   destIndex,
 });
 
-export const moveRankbarUp = (droppableId: Rankenum) => ({
+export const moveRankbarUp = (droppableId: string) => ({
   type: MOVE_RANKBAR_UP,
   droppableId,
 });
 
-export const moveRankbarDown = (droppableId: Rankenum) => ({
+export const moveRankbarDown = (droppableId: string) => ({
   type: MOVE_RANKBAR_DOWN,
   droppableId,
 });
 
 export const changeRankbarColor = (
   color: string,
-  currentSettingRow: string | null
+  currentSettingRowId: string | null
 ) => ({
   type: CHANGE_RANKBAR_COLOR,
   color,
-  currentSettingRow,
+  currentSettingRowId,
 });
 
 export const changeRankbarName = (
-  name: Rankenum,
-  currentSettingRow: Rankenum
+  name: string,
+  currentSettingRowId: string | null
 ) => ({
   type: CHANGE_RANKBAR_NAME,
   name,
-  currentSettingRow,
+  currentSettingRowId,
 });
+export const deleteRankbar = (currentSettingRowId: string) => {
+  return {
+    type: DELETE_RANKBAR,
+    currentSettingRowId,
+  };
+};
+export const clearRankbarItem = (currentSettingRowId: string) => {
+  return {
+    type: CLEAR_RANKBAR_ITEM,
+    currentSettingRowId,
+  };
+};
 
 const initialState1: TinitialState1 = [
   {
@@ -144,7 +160,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
       // 같은 droppid의 index에다가 밀어넣는것.
       if (sourceIndex === destIndex) return state;
       return produce(state, (draft) => {
-        const moveObj = draft.find((item) => item.name === sourceDropId);
+        const moveObj = draft.find((item) => item.id === sourceDropId);
         if (!moveObj) return;
         const moveItem = moveObj.item[sourceIndex];
         moveObj.item.splice(sourceIndex, 1);
@@ -153,8 +169,13 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case MOVE_CROSSLINE: {
       return produce(state, (draft) => {
-        const moveObj = draft.find((item) => item.name === sourceDropId);
-        const destObj = draft.find((item) => item.name === destDropId);
+        const moveObj = draft.find((item) => item.id === sourceDropId);
+        const destObj = draft.find((item) => item.id === destDropId);
+        // 여기서 item.name === dropId로 하고
+        // dropId를 name으로 하면 골치아파지는 이유는
+        // 나중에 이름을 바꾸거나 했을때.
+        // item.name은 바뀌는데, dropId는 안바뀌니까.
+        // 그냥 id property를 만들어서 그걸로 조회를 했다.
         if (!moveObj) return;
         const moveItem = moveObj.item[sourceIndex];
         moveObj.item.splice(sourceIndex, 1);
@@ -163,7 +184,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case MOVE_RANKBAR_UP: {
       return produce(state, (draft) => {
-        const moveObj = draft.find((obj) => obj.name === action.droppableId);
+        const moveObj = draft.find((obj) => obj.id === action.droppableId);
         if (!moveObj) return;
         const index = draft.indexOf(moveObj);
         if (index === 0) return;
@@ -173,7 +194,7 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case MOVE_RANKBAR_DOWN: {
       return produce(state, (draft) => {
-        const moveObj = draft.find((obj) => obj.name === action.droppableId);
+        const moveObj = draft.find((obj) => obj.id === action.droppableId);
         if (!moveObj) return;
         const index = draft.indexOf(moveObj);
         if (index === draft.length - 1) return;
@@ -183,13 +204,33 @@ export const itemReducer = (state = initialState1, action: Taction) => {
     }
     case CHANGE_RANKBAR_COLOR: {
       return produce(state, (draft) => {
-        const obj1 = draft.find((obj) => obj.id === action.currentSettingRow);
+        const obj1 = draft.find((obj) => obj.id === action.currentSettingRowId);
         if (!obj1) return;
         obj1.bgColor = action.color;
       });
     }
     case CHANGE_RANKBAR_NAME: {
-      return state;
+      return produce(state, (draft) => {
+        const obj1 = draft.find((obj) => obj.id === action.currentSettingRowId);
+        if (!obj1) return;
+        obj1.name = action.name;
+      });
+    }
+    case DELETE_RANKBAR: {
+      return produce(state, (draft) => {
+        const index = draft.findIndex(
+          (item) => item.id === action.currentSettingRowId
+        );
+        draft.splice(index, 1);
+      });
+    }
+    case CLEAR_RANKBAR_ITEM: {
+      return produce(state, (draft) => {
+        const index = draft.findIndex(
+          (item) => item.id === action.currentSettingRowId
+        );
+        draft[index].item = [];
+      });
     }
     default: {
       return state;
