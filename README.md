@@ -59,6 +59,11 @@ currentSettingRowId! 이것도
 
 5. rank부분 drag and drop 적용하기
 
+간단하지 않은것같다. 왜냐하면. rankbar에다가 droppable을 적용해버리면
+안에 있는 아이템이 이제는 rankbar에도 드롭되는걸로 인식해버리지 않나.
+
+더욱이 rankbar가 draggable해버리면 얘를 안에 있는 draggable에다가 집어넣을 수도 있으니까.
+
 <!-- 2-1. 리덕스 적용해보기. -->
 
 <!-- 일단 싱글라인부터. 그리고 disaptch는 컨테이너 없이 그냥 적용해보기. -->
@@ -72,3 +77,5 @@ currentSettingRowId! 이것도
 3. 이미지 만들어서 사용하는것
 
 4. 서버를 활용해서 이미지 업로드/ 이미지 삭제기능.
+
+5. github.io를 활용해서 페이지 업로드.

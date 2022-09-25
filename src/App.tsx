@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect } from "react";
 import styled from "styled-components";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
 import Row from "./Components/Row";
 import Container_item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
@@ -55,17 +60,16 @@ const App = () => {
     (state: RootState) => state.mode.currentSettingItem
   );
   const dispatch = useDispatch();
-  useEffect(() => {
-    console.log(itemArray);
-  });
-
   const onDragEnd = useCallback((result: DropResultPlus) => {
     console.log(result);
-
+    if (result.type === "rowDrop") {
+      console.log("row dropping");
+    }
     if (!result.destination) {
       console.log("no dest");
       return;
     }
+
     // 왜 빈 배열로 가면 result.dest가 없는거지?
     const {
       source: { droppableId: sourceDropId, index: sourceIndex },
@@ -111,22 +115,33 @@ const App = () => {
     <Home>
       <button onClick={() => window.location.reload()}>reload</button>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Container_Row>
-          {itemArray
-            .filter((item) => item.name !== Rankenum.ITEM)
-            .map((obj) => {
-              return (
-                <Row
-                  key={obj.id}
-                  droppableId={obj.id}
-                  name={obj.name}
-                  itemArray={obj.item}
-                  bgColor={obj.bgColor}
-                  onRowMoveBtn={onRowMoveBtn}
-                ></Row>
-              );
-            })}
-        </Container_Row>
+        <Droppable droppableId="rowDrop" type="rowDrop">
+          {(provided, snapshot) => (
+            <Container_Row ref={provided.innerRef}>
+              {itemArray
+                .filter((item) => item.name !== Rankenum.ITEM)
+                .map((obj, index) => {
+                  return (
+                    <Draggable index={index} draggableId={obj.id} key={obj.id}>
+                      {(provided, snapshot) => (
+                        <Row
+                          ref={provided.innerRef}
+                          draggableProps={provided.draggableProps}
+                          draggableStyle={provided.draggableProps.style}
+                          droppableId={obj.id}
+                          name={obj.name}
+                          itemArray={obj.item}
+                          bgColor={obj.bgColor}
+                          onRowMoveBtn={onRowMoveBtn}
+                        ></Row>
+                      )}
+                    </Draggable>
+                  );
+                })}
+            </Container_Row>
+          )}
+        </Droppable>
+
         <Container_item
           onDragEnd={onDragEnd}
           item={itemArray.find((item) => item.name === Rankenum.ITEM)?.item!}

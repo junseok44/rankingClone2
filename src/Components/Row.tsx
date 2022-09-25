@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 import {
   Draggable,
+  DraggableProvided,
   DraggingStyle,
   Droppable,
   NotDraggingStyle,
@@ -22,6 +23,7 @@ const RowContainer = styled.div`
   height: 100px;
   max-width: 100%;
   display: flex;
+  ${(props: any) => (props.draggableStyle ? { ...props.draggableStyle } : "")}
 `;
 const RowRank = styled.div`
   width: 100px;
@@ -90,12 +92,18 @@ const Row = ({
   droppableId,
   itemArray,
   name,
+  ref,
+  draggableProps,
+  draggableStyle,
   onRowMoveBtn,
 }: {
   bgColor: string;
   droppableId: string;
   itemArray: string[];
   name: string;
+  ref: any;
+  draggableStyle: any;
+  draggableProps: any;
   onRowMoveBtn: (direction: string, droppableId: string) => void;
 }) => {
   useEffect(() => {
@@ -104,10 +112,18 @@ const Row = ({
   const dispatch = useDispatch();
   return (
     <>
-      <RowContainer>
+      <RowContainer
+        ref={ref}
+        {...draggableProps}
+        draggableStyle={draggableStyle}
+      >
         <RowRank bgColor={bgColor}>{name}</RowRank>
         <DragContainer>
-          <Droppable droppableId={droppableId} direction="horizontal">
+          <Droppable
+            droppableId={droppableId}
+            direction="horizontal"
+            type="itemDrop"
+          >
             {(provided, snapshot) => (
               <DroppableItem
                 ref={provided.innerRef}
