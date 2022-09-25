@@ -15,12 +15,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { enterItemSetting } from "../modules/mode";
+import DraggableContainer from "./DraggableContainer";
 
 const RowContainer = styled.div`
-  &:not(:last-child) {
-    border-bottom: 1px solid black;
-  }
-  min-height: 12vh;
+  border-bottom: 1px solid black;
+  height: 100px;
   max-width: 100%;
   display: flex;
 `;
@@ -41,7 +40,7 @@ export const DroppableItem = styled.div`
   height: 100%;
   min-height: 10vh;
   display: flex;
-  overflow: auto;
+  overflow: none;
   background-color: ${({
     isDraggingOver,
     bgColor,
@@ -49,21 +48,6 @@ export const DroppableItem = styled.div`
     isDraggingOver: boolean;
     bgColor: string;
   }) => (isDraggingOver ? bgColor : "#dfe6e9")};
-`;
-export const DraggableItem = styled.div`
-  width: 100px;
-  height: 100px;
-  background-color: ${(props: { bgColor: string }) =>
-    props.bgColor ? props.bgColor : "black"};
-  border: 1px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  cursor: pointer;
-  ${(props: { draggableStyle: DraggingStyle | NotDraggingStyle }) => ({
-    ...props.draggableStyle,
-  })};
 `;
 
 const SettingBtn = styled.div`
@@ -132,19 +116,10 @@ const Row = ({
                 bgColor={bgColor}
               >
                 {itemArray.map((color, index) => (
-                  <Draggable key={color} index={index} draggableId={color}>
-                    {(provided, snapshot) => (
-                      <DraggableItem
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        bgColor={color}
-                        draggableStyle={provided.draggableProps.style}
-                      >
-                        {color}
-                      </DraggableItem>
-                    )}
-                  </Draggable>
+                  <DraggableContainer
+                    index={index}
+                    color={color}
+                  ></DraggableContainer>
                 ))}
                 {provided.placeholder}
               </DroppableItem>

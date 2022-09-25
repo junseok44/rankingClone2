@@ -100,6 +100,7 @@ const Overlay = ({
   onChangeRowColor,
   onDeleteRow,
   onClearRowItem,
+  onCreateRankbar,
   currentObj,
 }: {
   currentObj: rankObj;
@@ -107,6 +108,7 @@ const Overlay = ({
   onClearRowItem: () => void;
   onChangeRowColor: (color: string) => void;
   onChangeRowName: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCreateRankbar: (direction: string) => void;
 }) => {
   const dispatch = useDispatch();
   return (
@@ -129,6 +131,10 @@ const Overlay = ({
                 "#E6B333",
                 "#3366E6",
                 "#999966",
+                "#a29bfe",
+                "#fab1a0",
+                "#b2bec3",
+                "#ffeaa7",
               ].map((color) => {
                 return (
                   <ColorBox
@@ -154,8 +160,12 @@ const Overlay = ({
             <SettingBtn onClick={onClearRowItem}>Clear Row Images</SettingBtn>
           </SettingBtnRow>
           <SettingBtnRow>
-            <SettingBtn>Add a Row above</SettingBtn>
-            <SettingBtn>Add a Row below</SettingBtn>
+            <SettingBtn onClick={() => onCreateRankbar("up")}>
+              Add a Row above
+            </SettingBtn>
+            <SettingBtn onClick={() => onCreateRankbar("down")}>
+              Add a Row below
+            </SettingBtn>
           </SettingBtnRow>
         </Setting>
       </SettingOverlay>

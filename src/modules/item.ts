@@ -18,6 +18,11 @@ interface Taction {
   color: string;
   name: string;
   currentSettingRowId: string;
+  direction: "up" | "down";
+}
+
+interface TactionWithIndex<T> extends Taction {
+  index: T;
 }
 
 export enum Rankenum {
@@ -37,8 +42,7 @@ const CHANGE_RANKBAR_COLOR = "rank/change/Color";
 const CHANGE_RANKBAR_NAME = "rank/change/Name";
 const DELETE_RANKBAR = "rank/delete";
 const CLEAR_RANKBAR_ITEM = "rank/clear/item";
-const CREATE_RANKBAR_UP = "rank/create/up";
-const CREATE_RANKBAR_DOWN = "rank/create/down";
+const CREATE_RANKBAR = "rank/create";
 
 export const moveSingleLine = (
   sourceDropId: string,
@@ -103,13 +107,18 @@ export const clearRankbarItem = (currentSettingRowId: string) => {
     currentSettingRowId,
   };
 };
+export const createRankbar = (index: number, direction: string) => ({
+  type: CREATE_RANKBAR,
+  index,
+  direction,
+});
 
 const initialState1: TinitialState1 = [
   {
     name: Rankenum.S,
     id: "6158222534814353",
     bgColor: "#FF6633",
-    item: ["#0984e3", "#ffeaa7", "black", "#a29bfe"],
+    item: [],
   },
   {
     name: Rankenum.A,
@@ -148,11 +157,18 @@ const initialState1: TinitialState1 = [
       "#fab1a0",
       "#00b894",
       "#2d3436",
+      "#0984e3",
+      "#ffeaa7",
+      "black",
+      "#a29bfe",
     ],
   },
 ];
 
-export const itemReducer = (state = initialState1, action: Taction) => {
+export const itemReducer = (
+  state = initialState1,
+  action: TactionWithIndex<number>
+) => {
   const { sourceDropId, destDropId, sourceIndex, destIndex } = action;
   switch (action.type) {
     case MOVE_SINGLELINE: {
@@ -231,6 +247,47 @@ export const itemReducer = (state = initialState1, action: Taction) => {
         );
         draft[index].item = [];
       });
+    }
+    case CREATE_RANKBAR: {
+      if (action.direction === "up") {
+        console.log("up", action.index);
+        return produce(state, (draft) => {
+          const newRankBar: rankObj = {
+            bgColor: "#b2bec3",
+            id: Math.random().toString().substring(2, 16),
+            item: [],
+            name: "NEW",
+          };
+          draft.splice(action.index, 0, newRankBar);
+        });
+      } else if (action.direction === "down") {
+        console.log("down", action.index);
+        return produce(state, (draft) => {
+          const newRankBar: rankObj = {
+            bgColor: "#b2bec3",
+            id: Math.random().toString().substring(2, 16),
+            item: [],
+            name: "NEW",
+          };
+          draft.splice(action.index + 1, 0, newRankBar);
+        });
+      } else {
+        return state;
+      }
+
+      //   const newRankBar: rankObj = {
+      //     bgColor: "#b2bec3",
+      //     id: Math.random().toString().substring(2, 16),
+      //     item: [],
+      //     name: "NEW",
+      //   };
+      //   if (action.direction === "up") {
+      //     console.log("up");
+      //     draft.splice(action.index - 1, 0, newRankBar);
+      //   } else if (action.direction === "down") {
+      //     console.log("down");
+      //     draft.splice(action.index, 0, newRankBar);
+      //   }
     }
     default: {
       return state;

@@ -8,6 +8,7 @@ import {
   changeRankbarColor,
   changeRankbarName,
   clearRankbarItem,
+  createRankbar,
   deleteRankbar,
   moveCrossLine,
   moveRankbarDown,
@@ -43,7 +44,7 @@ const Container_Row = styled.div`
   width: 100%;
   border: 1px solid black;
   display: grid;
-  grid-template-rows: repeat(5, 1fr);
+  grid-auto-rows: 100px;
   margin-bottom: 2rem;
 `;
 
@@ -53,11 +54,9 @@ const App = () => {
   const currentSettingRowId = useSelector(
     (state: RootState) => state.mode.currentSettingItem
   );
-  // 이제 currentSettingRowId는 string으로 된 id입니다.
-  // 근데 그것보다는 그냥 currentSe
   const dispatch = useDispatch();
   useEffect(() => {
-    console.log("app home rendered");
+    console.log(itemArray);
   });
 
   const onDragEnd = useCallback((result: DropResultPlus) => {
@@ -85,7 +84,6 @@ const App = () => {
     },
     [dispatch, moveRankbarUp, moveRankbarDown]
   );
-
   const onChangeRowColor = (color: string) => {
     dispatch(changeRankbarColor(color, currentSettingRowId));
   };
@@ -101,8 +99,17 @@ const App = () => {
   const onClearRowItem = () => {
     dispatch(clearRankbarItem(currentSettingRowId!));
   };
+  const onCreateRankbar = (direction: string) => {
+    dispatch(
+      createRankbar(
+        itemArray.findIndex((item) => item.id === currentSettingRowId),
+        direction
+      )
+    );
+  };
   return (
     <Home>
+      <button onClick={() => window.location.reload()}>reload</button>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container_Row>
           {itemArray
@@ -136,6 +143,7 @@ const App = () => {
           onClearRowItem={onClearRowItem}
           onChangeRowName={onChangeRowName}
           onChangeRowColor={onChangeRowColor}
+          onCreateRankbar={onCreateRankbar}
         ></Overlay>
       )}
     </Home>
