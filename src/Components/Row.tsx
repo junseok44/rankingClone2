@@ -18,14 +18,14 @@ import { useDispatch } from "react-redux";
 import { enterItemSetting } from "../modules/mode";
 import DraggableContainer from "./DraggableContainer";
 
-const RowContainer = styled.div`
+export const RowContainer = styled.div`
   border-bottom: 1px solid black;
   height: 100px;
   max-width: 100%;
   display: flex;
   ${(props: any) => (props.draggableStyle ? { ...props.draggableStyle } : "")}
 `;
-const RowRank = styled.div`
+export const RowRank = styled.div`
   width: 100px;
   display: flex;
   justify-content: center;
@@ -35,7 +35,7 @@ const RowRank = styled.div`
   background-color: ${(props: { bgColor: string }) =>
     props.bgColor ? props.bgColor : "black"};
 `;
-const DragContainer = styled.div`
+export const DragContainer = styled.div`
   width: 100%;
 `;
 export const DroppableItem = styled.div`
@@ -43,6 +43,7 @@ export const DroppableItem = styled.div`
   min-height: 10vh;
   display: flex;
   overflow: none;
+  z-index: 100;
   background-color: ${({
     isDraggingOver,
     bgColor,
@@ -52,7 +53,7 @@ export const DroppableItem = styled.div`
   }) => (isDraggingOver ? bgColor : "#dfe6e9")};
 `;
 
-const SettingBtn = styled.div`
+export const SettingBtn = styled.div`
   background-color: black;
   width: 5%;
   height: 100%;
@@ -65,7 +66,7 @@ const SettingBtn = styled.div`
   font-size: 1.5rem;
 `;
 
-const MoveContainer = styled.div`
+export const MoveContainer = styled.div`
   background-color: black;
   width: 5%;
   height: 100%;
@@ -73,7 +74,7 @@ const MoveContainer = styled.div`
   flex-direction: column;
 `;
 
-const MoveBtn = styled.div`
+export const MoveBtn = styled.div`
   height: 50%;
   display: flex;
   justify-content: center;
@@ -95,6 +96,7 @@ const Row = ({
   ref,
   draggableProps,
   draggableStyle,
+  dragHandleProps,
   onRowMoveBtn,
 }: {
   bgColor: string;
@@ -104,6 +106,7 @@ const Row = ({
   ref: any;
   draggableStyle: any;
   draggableProps: any;
+  dragHandleProps: any;
   onRowMoveBtn: (direction: string, droppableId: string) => void;
 }) => {
   useEffect(() => {
@@ -117,7 +120,9 @@ const Row = ({
         {...draggableProps}
         draggableStyle={draggableStyle}
       >
-        <RowRank bgColor={bgColor}>{name}</RowRank>
+        <RowRank bgColor={bgColor} {...dragHandleProps}>
+          {name}
+        </RowRank>
         <DragContainer>
           <Droppable
             droppableId={droppableId}
@@ -127,7 +132,6 @@ const Row = ({
             {(provided, snapshot) => (
               <DroppableItem
                 ref={provided.innerRef}
-                {...provided.droppableProps}
                 isDraggingOver={snapshot.isDraggingOver}
                 bgColor={bgColor}
               >

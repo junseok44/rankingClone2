@@ -6,7 +6,15 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import Row from "./Components/Row";
+import Row, {
+  DragContainer,
+  DroppableItem,
+  MoveBtn,
+  MoveContainer,
+  RowContainer,
+  RowRank,
+  SettingBtn,
+} from "./Components/Row";
 import Container_item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
 import {
@@ -16,6 +24,7 @@ import {
   createRankbar,
   deleteRankbar,
   moveCrossLine,
+  moveRankbar,
   moveRankbarDown,
   moveRankbarUp,
   moveSingleLine,
@@ -24,7 +33,14 @@ import { useSelector } from "react-redux";
 import { RootState } from ".";
 import { Rankenum } from "./modules/item";
 import Overlay from "./Components/Overlay";
-import { exitItemSetting } from "./modules/mode";
+import { enterItemSetting, exitItemSetting } from "./modules/mode";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowDown,
+  faArrowUp,
+  faGear,
+} from "@fortawesome/free-solid-svg-icons";
+import DraggableContainer from "./Components/DraggableContainer";
 
 export interface DropResultPlus extends DropResult {
   source: {
@@ -64,6 +80,11 @@ const App = () => {
     console.log(result);
     if (result.type === "rowDrop") {
       console.log("row dropping");
+      const {
+        source: { index: sourceIndex },
+        destination: { index: destIndex },
+      } = result;
+      dispatch(moveRankbar(sourceIndex, destIndex));
     }
     if (!result.destination) {
       console.log("no dest");
@@ -124,16 +145,71 @@ const App = () => {
                   return (
                     <Draggable index={index} draggableId={obj.id} key={obj.id}>
                       {(provided, snapshot) => (
-                        <Row
+                        <RowContainer
                           ref={provided.innerRef}
-                          draggableProps={provided.draggableProps}
+                          {...provided.draggableProps}
                           draggableStyle={provided.draggableProps.style}
-                          droppableId={obj.id}
-                          name={obj.name}
-                          itemArray={obj.item}
-                          bgColor={obj.bgColor}
-                          onRowMoveBtn={onRowMoveBtn}
-                        ></Row>
+                        >
+                          <RowRank
+                            {...provided.dragHandleProps}
+                            bgColor={obj.bgColor}
+                          >
+                            {obj.name}
+                          </RowRank>
+                          <DragContainer>
+                            <Droppable
+                              droppableId={obj.id}
+                              direction="horizontal"
+                              type="itemDrop"
+                            >
+                              {(provided, snapshot) => (
+                                <DroppableItem
+                                  ref={provided.innerRef}
+                                  isDraggingOver={snapshot.isDraggingOver}
+                                  bgColor={obj.bgColor}
+                                >
+                                  {obj.item.map((color, index) => (
+                                    <DraggableContainer
+                                      index={index}
+                                      color={color}
+                                    ></DraggableContainer>
+                                  ))}
+                                  {provided.placeholder}
+                                </DroppableItem>
+                              )}
+                            </Droppable>
+                          </DragContainer>
+                          <SettingBtn
+                            onClick={() => dispatch(enterItemSetting(obj.id))}
+                          >
+                            <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
+                          </SettingBtn>
+                          <MoveContainer>
+                            <MoveBtn onClick={() => onRowMoveBtn("up", obj.id)}>
+                              <FontAwesomeIcon
+                                icon={faArrowUp}
+                              ></FontAwesomeIcon>
+                            </MoveBtn>
+                            <MoveBtn
+                              onClick={() => onRowMoveBtn("down", obj.id)}
+                            >
+                              <FontAwesomeIcon
+                                icon={faArrowDown}
+                              ></FontAwesomeIcon>
+                            </MoveBtn>
+                          </MoveContainer>
+                        </RowContainer>
+                        // <Row
+                        //   ref={provided.innerRef}
+                        //   draggableProps={provided.draggableProps}
+                        //   draggableStyle={provided.draggableProps.style}
+                        //   dragHandleProps={provided.dragHandleProps}
+                        //   droppableId={obj.id}
+                        //   name={obj.name}
+                        //   itemArray={obj.item}
+                        //   bgColor={obj.bgColor}
+                        //   onRowMoveBtn={onRowMoveBtn}
+                        // ></Row>
                       )}
                     </Draggable>
                   );

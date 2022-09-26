@@ -43,6 +43,7 @@ const CHANGE_RANKBAR_NAME = "rank/change/Name";
 const DELETE_RANKBAR = "rank/delete";
 const CLEAR_RANKBAR_ITEM = "rank/clear/item";
 const CREATE_RANKBAR = "rank/create";
+const MOVE_RANKBAR = "item/move/Rankbar";
 
 export const moveSingleLine = (
   sourceDropId: string,
@@ -113,12 +114,20 @@ export const createRankbar = (index: number, direction: string) => ({
   direction,
 });
 
+export const moveRankbar = (sourceIndex: number, destIndex: number) => {
+  return {
+    type: MOVE_RANKBAR,
+    sourceIndex,
+    destIndex,
+  };
+};
+
 const initialState1: TinitialState1 = [
   {
     name: Rankenum.S,
     id: "6158222534814353",
     bgColor: "#FF6633",
-    item: [],
+    item: ["#9b59b6", "#fab1a0"],
   },
   {
     name: Rankenum.A,
@@ -153,8 +162,6 @@ const initialState1: TinitialState1 = [
       "orange",
       "purple",
       "pink",
-      "#9b59b6",
-      "#fab1a0",
       "#00b894",
       "#2d3436",
       "#0984e3",
@@ -288,6 +295,12 @@ export const itemReducer = (
       //     console.log("down");
       //     draft.splice(action.index, 0, newRankBar);
       //   }
+    }
+    case MOVE_RANKBAR: {
+      return produce(state, (draft) => {
+        const [moveObj] = draft.splice(action.sourceIndex, 1);
+        draft.splice(action.destIndex, 0, moveObj);
+      });
     }
     default: {
       return state;

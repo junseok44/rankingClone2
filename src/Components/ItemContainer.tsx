@@ -26,7 +26,11 @@ const ItemContainer = ({
 }) => {
   return (
     <Container_Item>
-      <Droppable droppableId={droppableId} direction="horizontal">
+      <Droppable
+        droppableId={droppableId}
+        direction="horizontal"
+        type="itemDrop"
+      >
         {(provided, snapshot) => (
           <DroppableItem
             ref={provided.innerRef}
