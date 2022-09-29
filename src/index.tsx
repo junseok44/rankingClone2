@@ -8,6 +8,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { itemReducer } from "./modules/item";
 import { Provider } from "react-redux";
 import { mode } from "./modules/mode";
+import "./index.css";
 
 const store = configureStore({
   reducer: combineReducers({ item: itemReducer, mode }),

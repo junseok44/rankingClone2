@@ -85,6 +85,7 @@ const App = () => {
         destination: { index: destIndex },
       } = result;
       dispatch(moveRankbar(sourceIndex, destIndex));
+      return;
     }
     if (!result.destination) {
       console.log("no dest");
@@ -134,7 +135,15 @@ const App = () => {
   };
   return (
     <Home>
-      <button onClick={() => window.location.reload()}>reload</button>
+      <h1 style={{ fontSize: "2rem", marginBottom: "2rem" }}>
+        anime tier list
+      </h1>
+      <button
+        onClick={() => window.location.reload()}
+        style={{ marginBottom: "2rem" }}
+      >
+        reload
+      </button>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="rowDrop" type="rowDrop">
           {(provided, snapshot) => (
@@ -145,71 +154,11 @@ const App = () => {
                   return (
                     <Draggable index={index} draggableId={obj.id} key={obj.id}>
                       {(provided, snapshot) => (
-                        <RowContainer
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          draggableStyle={provided.draggableProps.style}
-                        >
-                          <RowRank
-                            {...provided.dragHandleProps}
-                            bgColor={obj.bgColor}
-                          >
-                            {obj.name}
-                          </RowRank>
-                          <DragContainer>
-                            <Droppable
-                              droppableId={obj.id}
-                              direction="horizontal"
-                              type="itemDrop"
-                            >
-                              {(provided, snapshot) => (
-                                <DroppableItem
-                                  ref={provided.innerRef}
-                                  isDraggingOver={snapshot.isDraggingOver}
-                                  bgColor={obj.bgColor}
-                                >
-                                  {obj.item.map((color, index) => (
-                                    <DraggableContainer
-                                      index={index}
-                                      color={color}
-                                    ></DraggableContainer>
-                                  ))}
-                                  {provided.placeholder}
-                                </DroppableItem>
-                              )}
-                            </Droppable>
-                          </DragContainer>
-                          <SettingBtn
-                            onClick={() => dispatch(enterItemSetting(obj.id))}
-                          >
-                            <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
-                          </SettingBtn>
-                          <MoveContainer>
-                            <MoveBtn onClick={() => onRowMoveBtn("up", obj.id)}>
-                              <FontAwesomeIcon
-                                icon={faArrowUp}
-                              ></FontAwesomeIcon>
-                            </MoveBtn>
-                            <MoveBtn
-                              onClick={() => onRowMoveBtn("down", obj.id)}
-                            >
-                              <FontAwesomeIcon
-                                icon={faArrowDown}
-                              ></FontAwesomeIcon>
-                            </MoveBtn>
-                          </MoveContainer>
-                        </RowContainer>
-                        // <Row
-                        //   ref={provided.innerRef}
-                        //   draggableProps={provided.draggableProps}
-                        //   draggableStyle={provided.draggableProps.style}
-                        //   dragHandleProps={provided.dragHandleProps}
-                        //   droppableId={obj.id}
-                        //   name={obj.name}
-                        //   itemArray={obj.item}
-                        //   bgColor={obj.bgColor}
-                        //   onRowMoveBtn={onRowMoveBtn}
-                        // ></Row>
+                        <Row
+                          provided={provided}
+                          obj={obj}
+                          onRowMoveBtn={onRowMoveBtn}
+                        ></Row>
                       )}
                     </Draggable>
                   );
@@ -217,9 +166,7 @@ const App = () => {
             </Container_Row>
           )}
         </Droppable>
-
         <Container_item
-          onDragEnd={onDragEnd}
           item={itemArray.find((item) => item.name === Rankenum.ITEM)?.item!}
           // 이부분 그냥 row로 바꾸어버리자.
           droppableId={

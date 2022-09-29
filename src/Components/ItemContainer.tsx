@@ -13,14 +13,15 @@ import { DroppableItem } from "./Row";
 const Container_Item = styled.div`
   width: 100%;
   height: 100px;
+  position: fixed;
+  bottom: 20px;
+  margin-top: 2rem;
 `;
 
 const ItemContainer = ({
-  onDragEnd,
   item,
   droppableId,
 }: {
-  onDragEnd: (result: DropResultPlus) => void;
   item: string[];
   droppableId: string;
 }) => {
@@ -37,10 +38,11 @@ const ItemContainer = ({
             {...provided.droppableProps}
             isDraggingOver={snapshot.isDraggingOver}
           >
-            {item.map((item, index) => (
+            {item.map((color, index) => (
               <DraggableContainer
+                key={color}
                 index={index}
-                color={item}
+                color={color}
               ></DraggableContainer>
             ))}
             {provided.placeholder}

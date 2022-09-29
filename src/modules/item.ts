@@ -122,6 +122,20 @@ export const moveRankbar = (sourceIndex: number, destIndex: number) => {
   };
 };
 
+const ReorderFunction = <T>(
+  list: T[],
+  sourceIndex: number,
+  destIndex: number
+): T[] => {
+  const result = Array.from(list);
+  const [moveItem] = result.splice(sourceIndex, 1);
+  result.splice(destIndex, 0, moveItem);
+  // 로직이 헷갈린다. [1,2,3,4,5] 에서 2를 4와 5 사이로 옮기면.
+  // 시작은 1 --> 4?
+  // dest가 완성된 array를 기준으로 하기 때문에 그런듯.
+  return result;
+};
+
 const initialState1: TinitialState1 = [
   {
     name: Rankenum.S,
@@ -179,29 +193,23 @@ export const itemReducer = (
   const { sourceDropId, destDropId, sourceIndex, destIndex } = action;
   switch (action.type) {
     case MOVE_SINGLELINE: {
-      // 여기서 해야할일은. state의 [dropid] 를 받아서. 거기 index를 하나 제거하고
-      // 같은 droppid의 index에다가 밀어넣는것.
-      if (sourceIndex === destIndex) return state;
+      const moveObj = state.find((item) => item.id === sourceDropId);
+      if (sourceIndex === destIndex || !moveObj) return state;
+      const index = state.findIndex((item) => item.id === moveObj.id);
       return produce(state, (draft) => {
-        const moveObj = draft.find((item) => item.id === sourceDropId);
-        if (!moveObj) return;
-        const moveItem = moveObj.item[sourceIndex];
-        moveObj.item.splice(sourceIndex, 1);
-        moveObj.item.splice(destIndex, 0, moveItem);
+        draft[index].item = ReorderFunction(
+          moveObj.item,
+          sourceIndex,
+          destIndex
+        );
       });
     }
     case MOVE_CROSSLINE: {
       return produce(state, (draft) => {
         const moveObj = draft.find((item) => item.id === sourceDropId);
         const destObj = draft.find((item) => item.id === destDropId);
-        // 여기서 item.name === dropId로 하고
-        // dropId를 name으로 하면 골치아파지는 이유는
-        // 나중에 이름을 바꾸거나 했을때.
-        // item.name은 바뀌는데, dropId는 안바뀌니까.
-        // 그냥 id property를 만들어서 그걸로 조회를 했다.
         if (!moveObj) return;
-        const moveItem = moveObj.item[sourceIndex];
-        moveObj.item.splice(sourceIndex, 1);
+        const [moveItem] = moveObj.item.splice(sourceIndex, 1);
         destObj?.item.splice(destIndex, 0, moveItem);
       });
     }
@@ -257,7 +265,6 @@ export const itemReducer = (
     }
     case CREATE_RANKBAR: {
       if (action.direction === "up") {
-        console.log("up", action.index);
         return produce(state, (draft) => {
           const newRankBar: rankObj = {
             bgColor: "#b2bec3",
@@ -268,7 +275,6 @@ export const itemReducer = (
           draft.splice(action.index, 0, newRankBar);
         });
       } else if (action.direction === "down") {
-        console.log("down", action.index);
         return produce(state, (draft) => {
           const newRankBar: rankObj = {
             bgColor: "#b2bec3",
@@ -281,26 +287,9 @@ export const itemReducer = (
       } else {
         return state;
       }
-
-      //   const newRankBar: rankObj = {
-      //     bgColor: "#b2bec3",
-      //     id: Math.random().toString().substring(2, 16),
-      //     item: [],
-      //     name: "NEW",
-      //   };
-      //   if (action.direction === "up") {
-      //     console.log("up");
-      //     draft.splice(action.index - 1, 0, newRankBar);
-      //   } else if (action.direction === "down") {
-      //     console.log("down");
-      //     draft.splice(action.index, 0, newRankBar);
-      //   }
     }
     case MOVE_RANKBAR: {
-      return produce(state, (draft) => {
-        const [moveObj] = draft.splice(action.sourceIndex, 1);
-        draft.splice(action.destIndex, 0, moveObj);
-      });
+      return ReorderFunction(state, sourceIndex, destIndex);
     }
     default: {
       return state;

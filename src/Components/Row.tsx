@@ -89,38 +89,31 @@ export const MoveBtn = styled.div`
 `;
 
 const Row = ({
-  bgColor,
-  droppableId,
-  itemArray,
-  name,
-  ref,
-  draggableProps,
-  draggableStyle,
-  dragHandleProps,
+  provided,
+  obj: { id: droppableId, item: itemArray, name, bgColor },
   onRowMoveBtn,
 }: {
-  bgColor: string;
-  droppableId: string;
-  itemArray: string[];
-  name: string;
-  ref: any;
-  draggableStyle: any;
-  draggableProps: any;
-  dragHandleProps: any;
+  provided: DraggableProvided;
+  obj: {
+    id: string;
+    item: string[];
+    name: string;
+    bgColor: string;
+  };
   onRowMoveBtn: (direction: string, droppableId: string) => void;
 }) => {
   useEffect(() => {
-    console.log("rendered" + droppableId);
+    console.log("rendered" + droppableId + name);
   });
   const dispatch = useDispatch();
   return (
     <>
       <RowContainer
-        ref={ref}
-        {...draggableProps}
-        draggableStyle={draggableStyle}
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        draggableStyle={provided.draggableProps.style}
       >
-        <RowRank bgColor={bgColor} {...dragHandleProps}>
+        <RowRank bgColor={bgColor} {...provided.dragHandleProps}>
           {name}
         </RowRank>
         <DragContainer>
@@ -137,6 +130,7 @@ const Row = ({
               >
                 {itemArray.map((color, index) => (
                   <DraggableContainer
+                    key={color}
                     index={index}
                     color={color}
                   ></DraggableContainer>
