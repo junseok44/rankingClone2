@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 import {
   DragDropContext,
@@ -6,16 +6,8 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import Row, {
-  DragContainer,
-  DroppableItem,
-  MoveBtn,
-  MoveContainer,
-  RowContainer,
-  RowRank,
-  SettingBtn,
-} from "./Components/Row";
-import Container_item from "./Components/ItemContainer";
+import Row from "./Components/Row";
+import Row_Item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
 import {
   changeRankbarColor,
@@ -40,7 +32,7 @@ import {
   faArrowUp,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
-import DraggableContainer from "./Components/DraggableContainer";
+import DraggableContainer from "./Components/DraggableComponent";
 import OverlayContainer from "./Container/OverlayContainer";
 
 export interface DropResultPlus extends DropResult {
@@ -62,47 +54,67 @@ const Home = styled.div`
   justify-content: center;
   align-items: center;
 `;
-const Container_Row = styled.div`
+const StyledRowContainer = styled.div`
   width: 100%;
   border: 1px solid black;
   display: grid;
   grid-auto-rows: 100px;
   margin-bottom: 2rem;
 `;
+const StyledH2 = styled.div`
+  font-size: 2rem;
+  margin-bottom: 2rem;
+`;
+
+const DisplayFlex = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
 
 const App = () => {
+  const rankArray = useSelector((state: RootState) => state.item);
+  const settingMode = useSelector((state: RootState) => state.mode.setting);
   const currentSettingRowId = useSelector(
     (state: RootState) => state.mode.currentSettingItem
   );
   const itemArray = useSelector((state: RootState) => state.item);
   const dispatch = useDispatch();
-  const onDragEnd = useCallback((result: DropResultPlus) => {
-    console.log(result);
-    if (result.type === "rowDrop") {
-      console.log("row dropping");
-      const {
-        source: { index: sourceIndex },
-        destination: { index: destIndex },
-      } = result;
-      dispatch(moveRankbar(sourceIndex, destIndex));
-      return;
-    }
-    if (!result.destination) {
-      console.log("no dest");
-      return;
-    }
+  const onDragEnd = useCallback(
+    (result: DropResultPlus) => {
+      if (result.type === "rowDrop") {
+        console.log("row dropping");
+        const {
+          source: { index: sourceIndex },
+          destination: { index: destIndex },
+        } = result;
+        dispatch(moveRankbar(sourceIndex, destIndex));
+        return;
+      }
+      if (!result.destination) {
+        console.log("no dest");
+        return;
+      }
 
-    // 왜 빈 배열로 가면 result.dest가 없는거지?
-    const {
-      source: { droppableId: sourceDropId, index: sourceIndex },
-      destination: { droppableId: destDropId, index: destIndex },
-    } = result;
-    if (sourceDropId === destDropId) {
-      dispatch(moveSingleLine(sourceDropId, sourceIndex, destIndex));
-    } else if (sourceDropId !== destDropId) {
-      dispatch(moveCrossLine(sourceDropId, destDropId, sourceIndex, destIndex));
-    }
-  }, []);
+      // 왜 빈 배열로 가면 result.dest가 없는거지?
+      const {
+        source: { droppableId: sourceDropId, index: sourceIndex },
+        destination: { droppableId: destDropId, index: destIndex },
+      } = result;
+      if (sourceDropId === destDropId) {
+        dispatch(moveSingleLine(sourceDropId, sourceIndex, destIndex));
+      } else if (sourceDropId !== destDropId) {
+        dispatch(
+          moveCrossLine(sourceDropId, destDropId, sourceIndex, destIndex)
+        );
+      }
+    },
+    [moveSingleLine, moveCrossLine]
+  );
   const onRowMoveBtn = useCallback(
     (direction: string, droppableId: string): void => {
       if (direction === "up") dispatch(moveRankbarUp(droppableId));
@@ -112,44 +124,54 @@ const App = () => {
   );
   return (
     <Home>
-      <h1 style={{ fontSize: "2rem", marginBottom: "2rem" }}>
-        anime tier list
-      </h1>
-      <button
-        onClick={() => window.location.reload()}
-        style={{ marginBottom: "2rem" }}
-      >
-        reload
-      </button>
+      <StyledH2>anime tier list</StyledH2>
+      <DisplayFlex>
+        <button
+          onClick={() => window.location.reload()}
+          style={{ marginBottom: "2rem" }}
+        >
+          reload
+        </button>
+        {/* <StyledForm onSubmit={handleSubmit}>
+          <label htmlFor="imgFile">upload your image</label>
+          <input id="imgFile" type="file" onChange={handleFileChange} />
+          <button type="submit">submit</button>
+        </StyledForm> */}
+      </DisplayFlex>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="rowDrop" type="rowDrop">
           {(provided, snapshot) => (
-            <Container_Row ref={provided.innerRef}>
-              {itemArray
-                .filter((item) => item.name !== Rankenum.ITEM)
-                .map((obj, index) => {
+            <StyledRowContainer ref={provided.innerRef}>
+              {rankArray
+                .filter((rank) => rank.name !== Rankenum.ITEM)
+                .map((rank, index) => {
                   return (
-                    <Draggable index={index} draggableId={obj.id} key={obj.id}>
+                    <Draggable
+                      index={index}
+                      draggableId={rank.id}
+                      key={rank.id}
+                    >
                       {(provided, snapshot) => (
                         <Row
                           provided={provided}
-                          obj={obj}
+                          rankObj={rank}
                           onRowMoveBtn={onRowMoveBtn}
                         ></Row>
                       )}
                     </Draggable>
                   );
                 })}
-            </Container_Row>
+            </StyledRowContainer>
           )}
         </Droppable>
-        <Container_item
-          item={itemArray.find((item) => item.name === Rankenum.ITEM)?.item!}
+        <Row_Item
+          item={rankArray.find((rank) => rank.name === Rankenum.ITEM)?.item!}
           // 이부분 그냥 row로 바꾸어버리자.
           droppableId={
-            itemArray.find((item) => item.name === Rankenum.ITEM)?.id!
+            rankArray.find((rank) => rank.name === Rankenum.ITEM)?.id!
           }
-        ></Container_item>
+        ></Row_Item>
       </DragDropContext>
       {currentSettingRowId && <OverlayContainer></OverlayContainer>}
     </Home>

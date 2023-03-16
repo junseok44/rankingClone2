@@ -16,7 +16,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { enterItemSetting } from "../modules/mode";
-import DraggableContainer from "./DraggableContainer";
+import DraggableComponent from "./DraggableComponent";
 
 export const RowContainer = styled.div`
   border-bottom: 1px solid black;
@@ -25,7 +25,7 @@ export const RowContainer = styled.div`
   display: flex;
   ${(props: any) => (props.draggableStyle ? { ...props.draggableStyle } : "")}
 `;
-export const RowRank = styled.div`
+export const RowTitle = styled.div`
   width: 100px;
   display: flex;
   justify-content: center;
@@ -35,10 +35,10 @@ export const RowRank = styled.div`
   background-color: ${(props: { bgColor: string }) =>
     props.bgColor ? props.bgColor : "black"};
 `;
-export const DragContainer = styled.div`
+export const Width100 = styled.div`
   width: 100%;
 `;
-export const DroppableItem = styled.div`
+export const StyledItemContainer = styled.div`
   height: 100%;
   min-height: 10vh;
   display: flex;
@@ -90,11 +90,11 @@ export const MoveBtn = styled.div`
 
 const Row = ({
   provided,
-  obj: { id: droppableId, item: itemArray, name, bgColor },
+  rankObj: { id: droppableId, item: itemArray, name, bgColor },
   onRowMoveBtn,
 }: {
   provided: DraggableProvided;
-  obj: {
+  rankObj: {
     id: string;
     item: string[];
     name: string;
@@ -102,9 +102,6 @@ const Row = ({
   };
   onRowMoveBtn: (direction: string, droppableId: string) => void;
 }) => {
-  useEffect(() => {
-    console.log("rendered" + droppableId + name);
-  });
   const dispatch = useDispatch();
   return (
     <>
@@ -113,33 +110,33 @@ const Row = ({
         {...provided.draggableProps}
         draggableStyle={provided.draggableProps.style}
       >
-        <RowRank bgColor={bgColor} {...provided.dragHandleProps}>
+        <RowTitle bgColor={bgColor} {...provided.dragHandleProps}>
           {name}
-        </RowRank>
-        <DragContainer>
+        </RowTitle>
+        <Width100>
           <Droppable
             droppableId={droppableId}
             direction="horizontal"
             type="itemDrop"
           >
             {(provided, snapshot) => (
-              <DroppableItem
+              <StyledItemContainer
                 ref={provided.innerRef}
                 isDraggingOver={snapshot.isDraggingOver}
                 bgColor={bgColor}
               >
                 {itemArray.map((color, index) => (
-                  <DraggableContainer
+                  <DraggableComponent
                     key={color}
                     index={index}
                     color={color}
-                  ></DraggableContainer>
+                  ></DraggableComponent>
                 ))}
                 {provided.placeholder}
-              </DroppableItem>
+              </StyledItemContainer>
             )}
           </Droppable>
-        </DragContainer>
+        </Width100>
         <SettingBtn
           onClick={useCallback(() => {
             dispatch(enterItemSetting(droppableId));

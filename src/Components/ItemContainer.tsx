@@ -1,16 +1,11 @@
 import React from "react";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { DropResultPlus } from "../App";
-import DraggableContainer from "./DraggableContainer";
-import { DroppableItem } from "./Row";
+import DraggableContainer from "./DraggableComponent";
+import { StyledItemContainer } from "./Row";
 
-const Container_Item = styled.div`
+const FixedContainer = styled.div`
   width: 100%;
   height: 100px;
   position: fixed;
@@ -26,14 +21,14 @@ const ItemContainer = ({
   droppableId: string;
 }) => {
   return (
-    <Container_Item>
+    <FixedContainer>
       <Droppable
         droppableId={droppableId}
         direction="horizontal"
         type="itemDrop"
       >
         {(provided, snapshot) => (
-          <DroppableItem
+          <StyledItemContainer
             ref={provided.innerRef}
             {...provided.droppableProps}
             isDraggingOver={snapshot.isDraggingOver}
@@ -46,10 +41,10 @@ const ItemContainer = ({
               ></DraggableContainer>
             ))}
             {provided.placeholder}
-          </DroppableItem>
+          </StyledItemContainer>
         )}
       </Droppable>
-    </Container_Item>
+    </FixedContainer>
   );
 };
 

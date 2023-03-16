@@ -130,9 +130,7 @@ const ReorderFunction = <T>(
   const result = Array.from(list);
   const [moveItem] = result.splice(sourceIndex, 1);
   result.splice(destIndex, 0, moveItem);
-  // 로직이 헷갈린다. [1,2,3,4,5] 에서 2를 4와 5 사이로 옮기면.
-  // 시작은 1 --> 4?
-  // dest가 완성된 array를 기준으로 하기 때문에 그런듯.
+
   return result;
 };
 
@@ -141,7 +139,7 @@ const initialState1: TinitialState1 = [
     name: Rankenum.S,
     id: "6158222534814353",
     bgColor: "#FF6633",
-    item: ["#9b59b6", "#fab1a0"],
+    item: [],
   },
   {
     name: Rankenum.A,
@@ -171,19 +169,23 @@ const initialState1: TinitialState1 = [
     name: Rankenum.ITEM,
     bgColor: "#636e72",
     id: "5539690055555553",
-    item: [
-      "red",
-      "orange",
-      "purple",
-      "pink",
-      "#00b894",
-      "#2d3436",
-      "#0984e3",
-      "#ffeaa7",
-      "black",
-      "#a29bfe",
-    ],
+    item: [],
   },
+];
+
+const colorArray = [
+  "#9b59b6",
+  "#fab1a0",
+  "red",
+  "orange",
+  "purple",
+  "pink",
+  "#00b894",
+  "#2d3436",
+  "#0984e3",
+  "#ffeaa7",
+  "black",
+  "#a29bfe",
 ];
 
 export const itemReducer = (
