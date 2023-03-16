@@ -33,7 +33,7 @@ import { useSelector } from "react-redux";
 import { RootState } from ".";
 import { Rankenum } from "./modules/item";
 import Overlay from "./Components/Overlay";
-import { enterItemSetting, exitItemSetting } from "./modules/mode";
+import { enterItemSetting, exitItemSetting, mode } from "./modules/mode";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowDown,
@@ -41,6 +41,7 @@ import {
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
 import DraggableContainer from "./Components/DraggableContainer";
+import OverlayContainer from "./Container/OverlayContainer";
 
 export interface DropResultPlus extends DropResult {
   source: {
@@ -70,11 +71,10 @@ const Container_Row = styled.div`
 `;
 
 const App = () => {
-  const itemArray = useSelector((state: RootState) => state.item);
-  const settingMode = useSelector((state: RootState) => state.mode.setting);
   const currentSettingRowId = useSelector(
     (state: RootState) => state.mode.currentSettingItem
   );
+  const itemArray = useSelector((state: RootState) => state.item);
   const dispatch = useDispatch();
   const onDragEnd = useCallback((result: DropResultPlus) => {
     console.log(result);
@@ -110,29 +110,6 @@ const App = () => {
     },
     [dispatch, moveRankbarUp, moveRankbarDown]
   );
-  const onChangeRowColor = (color: string) => {
-    dispatch(changeRankbarColor(color, currentSettingRowId));
-  };
-  const onChangeRowName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-    dispatch(changeRankbarName(e.target.value, currentSettingRowId));
-  };
-  const onDeleteRow = () => {
-    dispatch(exitItemSetting());
-    dispatch(deleteRankbar(currentSettingRowId!));
-    // 여기서 ! 해주는것도 좋지 않은것같은데 따로 처리해줄 수 있나.
-  };
-  const onClearRowItem = () => {
-    dispatch(clearRankbarItem(currentSettingRowId!));
-  };
-  const onCreateRankbar = (direction: string) => {
-    dispatch(
-      createRankbar(
-        itemArray.findIndex((item) => item.id === currentSettingRowId),
-        direction
-      )
-    );
-  };
   return (
     <Home>
       <h1 style={{ fontSize: "2rem", marginBottom: "2rem" }}>
@@ -174,16 +151,7 @@ const App = () => {
           }
         ></Container_item>
       </DragDropContext>
-      {settingMode && (
-        <Overlay
-          currentObj={itemArray.find((obj) => obj.id === currentSettingRowId)!}
-          onDeleteRow={onDeleteRow}
-          onClearRowItem={onClearRowItem}
-          onChangeRowName={onChangeRowName}
-          onChangeRowColor={onChangeRowColor}
-          onCreateRankbar={onCreateRankbar}
-        ></Overlay>
-      )}
+      {currentSettingRowId && <OverlayContainer></OverlayContainer>}
     </Home>
   );
 };
