@@ -7,7 +7,6 @@ import {
   NotDraggingStyle,
 } from "react-beautiful-dnd";
 import styled from "styled-components";
-import { Rankenum } from "../modules/item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGear,
@@ -17,6 +16,7 @@ import {
 import { useDispatch } from "react-redux";
 import { enterItemSetting } from "../modules/mode";
 import DraggableComponent from "./DraggableComponent";
+import { moveRankbarDown, moveRankbarUp } from "../modules/item";
 
 export const RowContainer = styled.div`
   border-bottom: 1px solid black;
@@ -91,29 +91,77 @@ export const MoveBtn = styled.div`
 const Row = ({
   provided,
   rankObj: { id: droppableId, item: itemArray, name, bgColor },
-  onRowMoveBtn,
 }: {
-  provided: DraggableProvided;
+  provided?: DraggableProvided;
   rankObj: {
     id: string;
     item: string[];
     name: string;
     bgColor: string;
   };
-  onRowMoveBtn: (direction: string, droppableId: string) => void;
 }) => {
   const dispatch = useDispatch();
+
+  const onRowMoveBtn = useCallback(
+    (direction: string, droppableId: string): void => {
+      if (direction === "up") dispatch(moveRankbarUp(droppableId));
+      else if (direction === "down") dispatch(moveRankbarDown(droppableId));
+    },
+    [dispatch, moveRankbarUp, moveRankbarDown]
+  );
   return (
     <>
-      <RowContainer
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        draggableStyle={provided.draggableProps.style}
-      >
-        <RowTitle bgColor={bgColor} {...provided.dragHandleProps}>
-          {name}
-        </RowTitle>
-        <Width100>
+      {provided ? (
+        <RowContainer
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          draggableStyle={provided.draggableProps.style}
+        >
+          <RowTitle bgColor={bgColor} {...provided.dragHandleProps}>
+            {name}
+          </RowTitle>
+          <Width100>
+            <Droppable
+              droppableId={droppableId}
+              direction="horizontal"
+              type="itemDrop"
+            >
+              {(provided, snapshot) => (
+                <StyledItemContainer
+                  ref={provided.innerRef}
+                  isDraggingOver={snapshot.isDraggingOver}
+                  bgColor={bgColor}
+                >
+                  {itemArray.map((color, index) => (
+                    <DraggableComponent
+                      key={color}
+                      index={index}
+                      color={color}
+                    ></DraggableComponent>
+                  ))}
+                  {provided.placeholder}
+                </StyledItemContainer>
+              )}
+            </Droppable>
+          </Width100>
+          <SettingBtn
+            onClick={() => {
+              dispatch(enterItemSetting(droppableId));
+            }}
+          >
+            <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
+          </SettingBtn>
+          <MoveContainer>
+            <MoveBtn onClick={() => onRowMoveBtn("up", droppableId)}>
+              <FontAwesomeIcon icon={faArrowUp}></FontAwesomeIcon>
+            </MoveBtn>
+            <MoveBtn onClick={() => onRowMoveBtn("down", droppableId)}>
+              <FontAwesomeIcon icon={faArrowDown}></FontAwesomeIcon>
+            </MoveBtn>
+          </MoveContainer>
+        </RowContainer>
+      ) : (
+        <RowContainer>
           <Droppable
             droppableId={droppableId}
             direction="horizontal"
@@ -136,23 +184,8 @@ const Row = ({
               </StyledItemContainer>
             )}
           </Droppable>
-        </Width100>
-        <SettingBtn
-          onClick={useCallback(() => {
-            dispatch(enterItemSetting(droppableId));
-          }, [dispatch])}
-        >
-          <FontAwesomeIcon icon={faGear}></FontAwesomeIcon>
-        </SettingBtn>
-        <MoveContainer>
-          <MoveBtn onClick={() => onRowMoveBtn("up", droppableId)}>
-            <FontAwesomeIcon icon={faArrowUp}></FontAwesomeIcon>
-          </MoveBtn>
-          <MoveBtn onClick={() => onRowMoveBtn("down", droppableId)}>
-            <FontAwesomeIcon icon={faArrowDown}></FontAwesomeIcon>
-          </MoveBtn>
-        </MoveContainer>
-      </RowContainer>
+        </RowContainer>
+      )}
     </>
   );
 };

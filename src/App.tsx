@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import {
   DragDropContext,
@@ -7,14 +7,8 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import Row from "./Components/Row";
-import Row_Item from "./Components/ItemContainer";
 import { useDispatch } from "react-redux";
 import {
-  changeRankbarColor,
-  changeRankbarName,
-  clearRankbarItem,
-  createRankbar,
-  deleteRankbar,
   moveCrossLine,
   moveRankbar,
   moveRankbarDown,
@@ -23,19 +17,9 @@ import {
 } from "./modules/item";
 import { useSelector } from "react-redux";
 import { RootState } from ".";
-import { Rankenum } from "./modules/item";
-import Overlay from "./Components/Overlay";
-import { enterItemSetting, exitItemSetting, mode } from "./modules/mode";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowDown,
-  faArrowUp,
-  faGear,
-} from "@fortawesome/free-solid-svg-icons";
-import DraggableContainer from "./Components/DraggableComponent";
 import OverlayContainer from "./Container/OverlayContainer";
 
-export interface DropResultPlus extends DropResult {
+export interface DropResultWithPosition extends DropResult {
   source: {
     droppableId: string;
     index: number;
@@ -76,16 +60,24 @@ const StyledForm = styled.form`
   flex-direction: column;
 `;
 
+const FixedContainer = styled.div`
+  width: 100%;
+  height: 100px;
+  position: fixed;
+  bottom: 20px;
+  margin-top: 2rem;
+`;
+
 const App = () => {
   const rankArray = useSelector((state: RootState) => state.item);
-  const settingMode = useSelector((state: RootState) => state.mode.setting);
+  const rankObj_item = rankArray.find((item) => item.name === "ITEM");
   const currentSettingRowId = useSelector(
-    (state: RootState) => state.mode.currentSettingItem
+    (state: RootState) => state.mode.currentSettingItemId
   );
-  const itemArray = useSelector((state: RootState) => state.item);
   const dispatch = useDispatch();
+
   const onDragEnd = useCallback(
-    (result: DropResultPlus) => {
+    (result: DropResultWithPosition) => {
       if (result.type === "rowDrop") {
         console.log("row dropping");
         const {
@@ -100,7 +92,6 @@ const App = () => {
         return;
       }
 
-      // 왜 빈 배열로 가면 result.dest가 없는거지?
       const {
         source: { droppableId: sourceDropId, index: sourceIndex },
         destination: { droppableId: destDropId, index: destIndex },
@@ -115,13 +106,7 @@ const App = () => {
     },
     [moveSingleLine, moveCrossLine]
   );
-  const onRowMoveBtn = useCallback(
-    (direction: string, droppableId: string): void => {
-      if (direction === "up") dispatch(moveRankbarUp(droppableId));
-      else if (direction === "down") dispatch(moveRankbarDown(droppableId));
-    },
-    [dispatch, moveRankbarUp, moveRankbarDown]
-  );
+
   return (
     <Home>
       <StyledH2>anime tier list</StyledH2>
@@ -144,20 +129,16 @@ const App = () => {
           {(provided, snapshot) => (
             <StyledRowContainer ref={provided.innerRef}>
               {rankArray
-                .filter((rank) => rank.name !== Rankenum.ITEM)
-                .map((rank, index) => {
+                .filter((rankObj) => rankObj.name !== "ITEM")
+                .map((rankObj, index) => {
                   return (
                     <Draggable
                       index={index}
-                      draggableId={rank.id}
-                      key={rank.id}
+                      draggableId={rankObj.id}
+                      key={rankObj.id}
                     >
                       {(provided, snapshot) => (
-                        <Row
-                          provided={provided}
-                          rankObj={rank}
-                          onRowMoveBtn={onRowMoveBtn}
-                        ></Row>
+                        <Row provided={provided} rankObj={rankObj}></Row>
                       )}
                     </Draggable>
                   );
@@ -165,13 +146,11 @@ const App = () => {
             </StyledRowContainer>
           )}
         </Droppable>
-        <Row_Item
-          item={rankArray.find((rank) => rank.name === Rankenum.ITEM)?.item!}
-          // 이부분 그냥 row로 바꾸어버리자.
-          droppableId={
-            rankArray.find((rank) => rank.name === Rankenum.ITEM)?.id!
-          }
-        ></Row_Item>
+        {rankObj_item ? (
+          <FixedContainer>
+            <Row rankObj={rankObj_item}></Row>
+          </FixedContainer>
+        ) : null}
       </DragDropContext>
       {currentSettingRowId && <OverlayContainer></OverlayContainer>}
     </Home>

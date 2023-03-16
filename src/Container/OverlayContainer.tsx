@@ -13,7 +13,7 @@ import Overlay from "../Components/Overlay";
 
 const OverlayContainer = () => {
   const currentSettingRowId = useSelector(
-    (state: RootState) => state.mode.currentSettingItem
+    (state: RootState) => state.mode.currentSettingItemId
   );
   const itemArray = useSelector((state: RootState) => state.item);
   const dispatch = useDispatch();

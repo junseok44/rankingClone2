@@ -3,16 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 const slice = createSlice({
   name: "mode",
   initialState: {
-    setting: false,
-    currentSettingItem: null,
+    currentSettingItemId: null,
   },
   reducers: {
     enterItemSetting(state, action) {
-      state.setting = true;
-      state.currentSettingItem = action.payload;
+      state.currentSettingItemId = action.payload;
     },
     exitItemSetting(state) {
-      state.setting = !state.setting;
+      state.currentSettingItemId = null;
     },
   },
 });

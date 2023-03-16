@@ -1,7 +1,7 @@
 import { produce } from "immer";
-
+import { v4 } from "uuid";
 export interface rankObj {
-  name: any;
+  name: string;
   bgColor: string;
   item: string[];
   id: string;
@@ -25,14 +25,8 @@ interface TactionWithIndex<T> extends Taction {
   index: T;
 }
 
-export enum Rankenum {
-  "S" = "S",
-  "A" = "A",
-  "B" = "B",
-  "C" = "C",
-  "D" = "D",
-  "ITEM" = "ITEM",
-}
+const RankNameArray = ["A", "B", "C", "D", "E", "ITEM"] as const;
+type RankName = typeof RankNameArray[number];
 
 const MOVE_SINGLELINE = "item/move/singleLine";
 const MOVE_CROSSLINE = "item/move/crossLine";
@@ -136,40 +130,40 @@ const ReorderFunction = <T>(
 
 const initialState1: TinitialState1 = [
   {
-    name: Rankenum.S,
-    id: "6158222534814353",
+    name: RankNameArray[0],
+    id: v4(),
     bgColor: "#FF6633",
     item: [],
   },
   {
-    name: Rankenum.A,
-    id: "8040881574028147",
+    name: RankNameArray[1],
+    id: v4(),
     bgColor: "#FFB399",
     item: [],
   },
   {
-    name: Rankenum.B,
-    id: "5214879317176004",
+    name: RankNameArray[2],
+    id: v4(),
     bgColor: "#FF33FF",
     item: [],
   },
   {
-    name: Rankenum.C,
-    id: "8189987661048699",
+    name: RankNameArray[3],
+    id: v4(),
     bgColor: "#FFFF99",
     item: [],
   },
   {
-    name: Rankenum.D,
-    id: "5335203244999249",
+    name: RankNameArray[4],
+    id: v4(),
     bgColor: "#00B3E6",
     item: [],
   },
   {
-    name: Rankenum.ITEM,
+    name: RankNameArray[5],
     bgColor: "#636e72",
-    id: "5539690055555553",
-    item: [],
+    id: v4(),
+    item: ["red"],
   },
 ];
 
