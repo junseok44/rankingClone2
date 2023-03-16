@@ -6,15 +6,15 @@ import {
 } from "react-beautiful-dnd";
 import styled from "styled-components";
 
-export const StyledItemBox = styled.div`
+export const StyledItemBox = styled.div<{ imgSrc: string }>`
   width: 100px;
   height: 100px;
   box-sizing: border-box;
-  background-color: ${(props: { bgColor: string }) =>
-    props.bgColor ? props.bgColor : "black"};
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: ${(props: { imgSrc: string }) =>
+    props.imgSrc ? `url(${props.imgSrc})` : "black"};
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
   color: white;
   cursor: pointer;
   ${(props: { draggableStyle: DraggingStyle | NotDraggingStyle }) => ({
@@ -23,25 +23,25 @@ export const StyledItemBox = styled.div`
 `;
 
 const DraggableComponent = ({
-  color,
+  id,
+  imgSrc,
   index,
 }: {
-  color: string;
+  id: string;
   index: number;
+  imgSrc: string;
 }) => {
   return (
     <>
-      <Draggable key={color} index={index} draggableId={color}>
+      <Draggable key={id} index={index} draggableId={id}>
         {(provided, snapshot) => (
           <StyledItemBox
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            bgColor={color}
+            imgSrc={imgSrc}
             draggableStyle={provided.draggableProps.style}
-          >
-            {color}
-          </StyledItemBox>
+          ></StyledItemBox>
         )}
       </Draggable>
     </>

@@ -3,11 +3,15 @@ import { v4 } from "uuid";
 export interface rankObj {
   name: string;
   bgColor: string;
-  item: string[];
+  item: TItem[];
   id: string;
 }
 type TinitialState1 = rankObj[];
 
+export type TItem = {
+  id: string;
+  sourceUrl: string;
+};
 interface Taction {
   type: string;
   sourceDropId: string;
@@ -23,6 +27,10 @@ interface Taction {
 
 interface TactionWithIndex<T> extends Taction {
   index: T;
+  item: {
+    sourceUrl: string;
+    id: string;
+  };
 }
 
 const RankNameArray = ["A", "B", "C", "D", "E", "ITEM"] as const;
@@ -38,6 +46,7 @@ const DELETE_RANKBAR = "rank/delete";
 const CLEAR_RANKBAR_ITEM = "rank/clear/item";
 const CREATE_RANKBAR = "rank/create";
 const MOVE_RANKBAR = "item/move/Rankbar";
+const CREATE_ITEM = "item/create";
 
 export const moveSingleLine = (
   sourceDropId: string,
@@ -115,6 +124,22 @@ export const moveRankbar = (sourceIndex: number, destIndex: number) => {
     destIndex,
   };
 };
+export const createItem = (sourceUrl: string) => {
+  return {
+    type: CREATE_ITEM,
+    item: {
+      sourceUrl,
+      id: v4(),
+    },
+  };
+};
+
+// class Item {
+//   constructor(name, sourceUrl, bgColor) {
+//     this.name = name;
+//     this.sourceUrl = sourceUrl;
+//   }
+// }
 
 const ReorderFunction = <T>(
   list: T[],
@@ -163,7 +188,7 @@ const initialState1: TinitialState1 = [
     name: RankNameArray[5],
     bgColor: "#636e72",
     id: v4(),
-    item: ["red"],
+    item: [],
   },
 ];
 
@@ -286,6 +311,14 @@ export const itemReducer = (
     }
     case MOVE_RANKBAR: {
       return ReorderFunction(state, sourceIndex, destIndex);
+    }
+    case CREATE_ITEM: {
+      return produce(state, (draft) => {
+        const itemRankIndex = draft.findIndex(
+          (rankObj) => rankObj.name == "ITEM"
+        );
+        draft[itemRankIndex].item.push(action.item);
+      });
     }
     default: {
       return state;

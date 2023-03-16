@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import {
   DragDropContext,
@@ -9,6 +9,7 @@ import {
 import Row from "./Components/Row";
 import { useDispatch } from "react-redux";
 import {
+  createItem,
   moveCrossLine,
   moveRankbar,
   moveRankbarDown,
@@ -106,7 +107,20 @@ const App = () => {
     },
     [moveSingleLine, moveCrossLine]
   );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFileUrl(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+  const [fileUrl, setFileUrl] = useState("");
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (fileUrl) {
+      dispatch(createItem(fileUrl));
+      setFileUrl("");
+    }
+  };
   return (
     <Home>
       <StyledH2>anime tier list</StyledH2>
@@ -117,11 +131,13 @@ const App = () => {
         >
           reload
         </button>
-        {/* <StyledForm onSubmit={handleSubmit}>
+
+        <StyledForm onSubmit={handleSubmit}>
+          <img src={fileUrl} style={{ width: "100px", height: "100px" }}></img>
           <label htmlFor="imgFile">upload your image</label>
-          <input id="imgFile" type="file" onChange={handleFileChange} />
+          <input id="imgFile" type="file" onChange={handleChange} />
           <button type="submit">submit</button>
-        </StyledForm> */}
+        </StyledForm>
       </DisplayFlex>
 
       <DragDropContext onDragEnd={onDragEnd}>

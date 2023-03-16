@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import {
-  Draggable,
-  DraggableProvided,
-  DraggingStyle,
-  Droppable,
-  NotDraggingStyle,
-} from "react-beautiful-dnd";
+import { DraggableProvided, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,16 +10,16 @@ import {
 import { useDispatch } from "react-redux";
 import { enterItemSetting } from "../modules/mode";
 import DraggableComponent from "./DraggableComponent";
-import { moveRankbarDown, moveRankbarUp } from "../modules/item";
+import { moveRankbarDown, moveRankbarUp, TItem } from "../modules/item";
 
-export const RowContainer = styled.div`
+const RowContainer = styled.div`
   border-bottom: 1px solid black;
   height: 100px;
   max-width: 100%;
   display: flex;
   ${(props: any) => (props.draggableStyle ? { ...props.draggableStyle } : "")}
 `;
-export const RowTitle = styled.div`
+const RowTitle = styled.div`
   width: 100px;
   display: flex;
   justify-content: center;
@@ -35,10 +29,10 @@ export const RowTitle = styled.div`
   background-color: ${(props: { bgColor: string }) =>
     props.bgColor ? props.bgColor : "black"};
 `;
-export const Width100 = styled.div`
+const Width100 = styled.div`
   width: 100%;
 `;
-export const StyledItemContainer = styled.div`
+const StyledItemContainer = styled.div`
   height: 100%;
   min-height: 10vh;
   display: flex;
@@ -53,7 +47,7 @@ export const StyledItemContainer = styled.div`
   }) => (isDraggingOver ? bgColor : "#dfe6e9")};
 `;
 
-export const SettingBtn = styled.div`
+const SettingBtn = styled.div`
   background-color: black;
   width: 5%;
   height: 100%;
@@ -66,7 +60,7 @@ export const SettingBtn = styled.div`
   font-size: 1.5rem;
 `;
 
-export const MoveContainer = styled.div`
+const MoveContainer = styled.div`
   background-color: black;
   width: 5%;
   height: 100%;
@@ -74,7 +68,7 @@ export const MoveContainer = styled.div`
   flex-direction: column;
 `;
 
-export const MoveBtn = styled.div`
+const MoveBtn = styled.div`
   height: 50%;
   display: flex;
   justify-content: center;
@@ -95,7 +89,7 @@ const Row = ({
   provided?: DraggableProvided;
   rankObj: {
     id: string;
-    item: string[];
+    item: TItem[];
     name: string;
     bgColor: string;
   };
@@ -132,11 +126,12 @@ const Row = ({
                   isDraggingOver={snapshot.isDraggingOver}
                   bgColor={bgColor}
                 >
-                  {itemArray.map((color, index) => (
+                  {itemArray.map((item, index) => (
                     <DraggableComponent
-                      key={color}
+                      key={item.id}
+                      id={item.id}
                       index={index}
-                      color={color}
+                      imgSrc={item.sourceUrl}
                     ></DraggableComponent>
                   ))}
                   {provided.placeholder}
@@ -173,11 +168,12 @@ const Row = ({
                 isDraggingOver={snapshot.isDraggingOver}
                 bgColor={bgColor}
               >
-                {itemArray.map((color, index) => (
+                {itemArray.map((item, index) => (
                   <DraggableComponent
-                    key={color}
+                    key={item.id}
+                    id={item.id}
                     index={index}
-                    color={color}
+                    imgSrc={item.sourceUrl}
                   ></DraggableComponent>
                 ))}
                 {provided.placeholder}
