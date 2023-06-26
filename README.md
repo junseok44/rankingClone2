@@ -64,12 +64,6 @@ currentSettingRowId! 이것도
 
 더욱이 rankbar가 draggable해버리면 얘를 안에 있는 draggable에다가 집어넣을 수도 있으니까.
 
-이건 type를 통해서 해결이 가능함.
-
-그런데 문제는.
-
-안에 있는 item이 드래그가 안된다는것이다.
-
 드래그 해결한다음에 할 것
 
 1. 컴포넌트 분리하기.
@@ -79,16 +73,6 @@ currentSettingRowId! 이것도
    아래에 있는 item이 이상해짐.
    아무래도 드래그하는동안 없어져서
    그만큼 위로 올라가는듯함.
-
-<!-- 2-1. 리덕스 적용해보기. -->
-
-<!-- 일단 싱글라인부터. 그리고 disaptch는 컨테이너 없이 그냥 적용해보기. -->
-
-<!-- - typescript redux documentation 읽어보기. -->
-<!-- - 구체적으로 container라던지. 그 값을 제공해주는게 아니라 짬밥해서 쓰는중. -->
-  <!-- 지금 reducer action type 부분에서 에러가 나서 그냥 reducer를 any라고 해두긴 했음. -->
-  <!-- 이건 combineReducers를 통해서 해결함. -->
-  <!-- - createSlice로도 한번 해보기.  -->
 
 3. 이미지 만들어서 사용하는것
 
